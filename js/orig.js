@@ -188,7 +188,7 @@ const {MapboxOverlay} = deck;
         map.addSource('epc', {
         type: 'geojson',
         // Use a URL for the value for the `data` property.
-        data: './wmca_epc_data.geojson'
+        data: 'https://bear-rsg.github.io/diatomic/js/wmca_epc_data.geojson'
     });
 
     map.addLayer({
