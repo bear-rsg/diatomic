@@ -1,1 +1,108 @@
+.mapboxgl-ctrl-icon {
+    padding: 0;
+}
+#menu {
+    position: absolute;
+    background: #227ba6;
+    padding: 10px;
+    font-family: 'Open Sans', sans-serif;
+    top: 2vh;
+    left: 1vw;
+    border-radius: 6px;
+}
+.mapboxgl-popup {
+    max-width: 400px;
+    font:
+        12px/20px 'Helvetica Neue',
+        Arial,
+        Helvetica,
+        sans-serif;
+}
 
+#loader {
+    border: 16px solid #f3f3f3;
+    /* Light grey */
+    border-top: 16px solid #227ba6;
+    /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -100px;
+    z-index: 2;
+    visibility: hidden;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.epc-info {
+    position: absolute;
+    font-family: sans-serif;
+    padding: 5px;
+    width: 80%;
+    border: 1px solid black;
+    font-size: 14px;
+    color: #222;
+    background-color: #fff;
+    border-radius: 6px;
+    bottom: -66vh;
+}
+
+#control-panel {
+    position: absolute;
+    top: -0.5vh;
+    right: 3vw;
+    margin: 12px;
+    padding: 20px;
+    font-size: 12px;
+    line-height: 1.5;
+    z-index: 1;
+    background: #fff;
+    font-family: Helvetica, Arial, sans-serif;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+    color: #222;
+    background-color: #fff;
+    border-radius: 6px;
+    width: 12%;
+    z-index: 2147483647;
+}
+
+.responsive {
+    width: 100%;
+    height: auto;
+}
+
+.epc_a { color: #02895d; }
+.epc_b { color: #1bb359; }
+.epc_c { color: #8cc637; }
+.epc_d { color: #f0c713; }
+.epc_e { color: #f8b368; }
+.epc_f { color: #f18421; }
+.epc_g { color: #d4340d; }
+
+.calculation-box {
+    height: 184px;
+    width: 150px;
+    position: absolute;
+    bottom: 40px;
+    left: 90px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    text-align: center;
+    font-size: 10px;
+    color: blue;
+    visibility: collapse;
+
+}
