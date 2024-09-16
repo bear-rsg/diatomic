@@ -7,7 +7,7 @@ const {MapboxOverlay} = deck;
     const map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/dark-v11',
         // style: 'mapbox://styles/mapbox/satellite-streets-v12',
-        center: [-1.833550, 52.456540],
+        center: [-1.8802233550562848, 52.46858250430878],
         zoom: 16,
         pitch: 45,
         bearing: -17.6,
