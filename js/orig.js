@@ -188,7 +188,7 @@ const {MapboxOverlay} = deck;
         map.addSource('epc', {
         type: 'geojson',
         // Use a URL for the value for the `data` property.
-        data: 'http://127.0.0.1:8000/static/js/wmca_epc_data.geojson'
+        data: './wmca_epc_data.geojson'
     });
 
     map.addLayer({
