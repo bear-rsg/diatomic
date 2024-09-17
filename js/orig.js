@@ -1,4 +1,5 @@
-const {MapboxOverlay} = deck;
+
+    const {MapboxOverlay} = deck;
 
     // Get a mapbox API access token
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbHllbHc0c24wM2V4MnJzYjd6d3NhcDQ5In0.NqG44ctju4Fm25dTP8GqZQ';
@@ -7,6 +8,7 @@ const {MapboxOverlay} = deck;
     const map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/dark-v11',
         // style: 'mapbox://styles/mapbox/satellite-streets-v12',
+//        center: [-1.833550, 52.456540],
         center: [-1.8802233550562848, 52.46858250430878],
         zoom: 16,
         pitch: 45,
@@ -31,8 +33,38 @@ const {MapboxOverlay} = deck;
     map.addControl(draw);
 
     map.on('draw.create', updateArea);
-    map.on('draw.delete', updateArea);
+    // map.on('draw.delete', updateArea);
     map.on('draw.update', updateArea);
+
+    function foundLassoFeatures(fpolygonsArr){
+        if(!map.getLayer('found')){
+            map.addSource('found', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Polygon',
+                            // These coordinates build the found feature.
+                            'coordinates': fpolygonsArr
+                        }
+                    }
+                });
+
+                // Add a new layer to visualize the polygon.
+                map.addLayer({
+                    'id': 'found-layer',
+                    'type': 'fill-extrusion',
+                    'source': 'found', // reference the data source
+                    'paint': {
+                        'fill-extrusion-color': '#52be80',
+                        'fill-extrusion-height': 20,
+                        'fill-extrusion-opacity': 0.8,
+                    }
+                });
+
+                alert("added found features layer");
+        }
+    }
 
     function updateArea(e) {
         alert("updating info for polygon");
@@ -66,30 +98,37 @@ const {MapboxOverlay} = deck;
 
         var foundFeatures = 0;
         var foundFeatureCoords = "";
+        var foundFeaturePolygons = [];
 
         for(var i=0;i<featureSet.length;i++){
 
             var epcObj = featureSet[i];
 
             if( epcObj['properties']['current-energy-efficiency'] != null ){
-                var polygon = turf.polygon(epcObj['geometry']['coordinates']);
-                var point = turf.point(polygon['geometry']['coordinates'][0][0]);
-                console.log("polygon built: "+ JSON.stringify(polygon));
-                console.log("polygon point data: "+ polygon['geometry']['coordinates'][0][0]);
-                console.log("point: "+ point);
-                pointsInside = turf.pointsWithinPolygon(point, searchWithin);
+                var lasso_polygon = searchWithin;
+                var point_data = epcObj['geometry']['coordinates'][0][0];
+                //var point = turf.point(point_data);
+                console.log("epcObj point data: "+ point_data);
+                //console.log("point: "+ point);
+                pointsInside = turf.pointsWithinPolygon([point_data], lasso_polygon);
+                console.log("turf.pointsWithinPolygon("+  JSON.stringify(point_data)+ ", "+ JSON.stringify(lasso_polygon)+")");
 
-                if (!pointsInside) {
+                if(!pointsInside) {
+                    console.log("point: "+ point + "not inside boundary");
                     return;
                 }else{
                     foundFeatures++;
-                    foundFeatureCoords += "|"+polygon['geometry']['coordinates'][0][0]+"|\n\n";
+                    foundFeaturePolygons.push(point_data);
+                    foundFeatureCoords += "|"+point_data+"|\n\n";
                 }
 
             }
 
         }
         alert("found " + foundFeatures + " features inside boundary");
+        var fpolygonsArr = JSON.stringify(foundFeaturePolygons);
+        console.log(fpolygonsArr);
+        foundLassoFeatures(fpolygonsArr);
         alert("foundFeatureCoords: \n\n" + foundFeatureCoords + "");
 
         if (data.features.length > 0) {
@@ -188,7 +227,7 @@ const {MapboxOverlay} = deck;
         map.addSource('epc', {
         type: 'geojson',
         // Use a URL for the value for the `data` property.
-        data: 'https://bear-rsg.github.io/diatomic/js/wmca_epc_data.geojson'
+        data: 'http://127.0.0.1:8000/static/js/wmca_epc_data.geojson'
     });
 
     map.addLayer({
