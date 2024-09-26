@@ -145,14 +145,18 @@
 
             if( epcObj['properties']['current-energy-efficiency'] != null ){
                 //var lasso_polygon = searchWithin;
-
-                var point_data = epcObj['geometry']['coordinates'][0][0];
+                if(epcObj['geometry']['type']=='MultiPolygon'){
+                    var point_data = epcObj['geometry']['coordinates'][0][0][0];
+                }else{
+                    var point_data = epcObj['geometry']['coordinates'][0][0];
+                }
                 console.log("point_data:" + point_data);
 
                 var pntInPolygon = isPointInPolygon(point_data, polygonData);
                 console.log("pntInPolygon (" + point_data + "): "+ pntInPolygon);
                 console.log("epcObj['geometry']['coordinates'][0]:" + epcObj['geometry']['coordinates'][0]);
 
+                var featureType = epcObj['geometry']['type'];
                 if(pntInPolygon) {
                     foundFeatures++;
                     var featObj = epcObj;
@@ -160,9 +164,9 @@
                     foundFeatureUprns += epcObj['properties'].UPRN+"\n";
                     totalEPC += parseInt(epcObj['properties']['current-energy-efficiency']);
                     totalPotentialEPC += parseInt(epcObj['properties']['potential-energy-efficiency']);
+                    console.log("Feature UPRN: "+ epcObj['properties'].UPRN + " ("+featureType+") is inside boundary");
                 }else {
-                    var featureType = epcObj['geometry']['type'];
-                    console.log("Feature UPRN: "+ epcObj['properties'].UPRN + "("+featureType+") not inside boundary");
+                    console.log("Feature UPRN: "+ epcObj['properties'].UPRN + " ("+featureType+") not inside boundary");
                 }
 
             }
@@ -265,7 +269,7 @@
         map.addSource('epc', {
         type: 'geojson',
         // Use a URL for the value for the `data` property.
-        data: 'https://bear-rsg.github.io/diatomic/js/wmca_epc_data.geojson'
+        data: 'http://127.0.0.1:8000/static/js/wmca_epc_data.geojson'
     });
 
     map.addLayer({
@@ -434,7 +438,11 @@
                 }
             });
         });
-});
+
+       /* map.jumpTo({
+            pitch: 0
+        }); */
+    });
         $(document).ready(function(){
 
             var mc = {
