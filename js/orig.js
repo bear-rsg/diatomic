@@ -11,7 +11,7 @@
 //        center: [-1.833550, 52.456540],
         center: [-1.8802233550562848, 52.46858250430878],
         zoom: 16,
-        pitch: 45,
+        pitch: 75,
         bearing: -17.6,
         container: 'map',
         antialias: true
@@ -27,8 +27,33 @@
     // to the geographic bounds representing East Birmingham
             bbox: [-1.9285,52.4604,-1.8557,52.4952],
             mapboxgl: mapboxgl
-        })
+        }), 'top-left'
     );
+
+
+    const months = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+    ];
+
+    function filterBy(month) {
+        const filters = ['==', 'month', month];
+        //map.setFilter('epc-circles', filters);
+        //map.setFilter('epc-labels', filters);
+
+        // Set the label to the month
+        document.getElementById('month').textContent = months[month];
+    }
 
     const draw = new MapboxDraw({
         displayControlsDefault: false,
@@ -42,21 +67,40 @@
         // defaultMode: 'draw_polygon'
     });
 
-    map.addControl(draw, 'top-right');
+    map.addControl(draw, 'top-left');
 
     map.on('draw.create', updateArea);
-    // map.on('draw.delete', updateArea);
+    map.on('draw.delete', clearFoundFeatures);
     map.on('draw.update', updateArea);
 
+    map.addControl(
+        new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            // When active the map will receive updates to the device's location as it changes.
+            trackUserLocation: true,
+            // Draw an arrow next to the location dot to indicate which direction the device is heading.
+            showUserHeading: true
+        }), 'top-left'
+    );
 
-    function foundLassoFeatures(fpolygonsArr){
-        console.log('fpolygonsArr passed to foundLassoFeatures: '+ fpolygonsArr);
-        var fc = turf.featureCollection(fpolygonsArr);
-        console.log('fc: '+ JSON.stringify(fc));
+    function clearFoundFeatures() {
         if(map.getLayer('found-layer')){
             map.removeLayer('found-layer');
             console.log('found-layer has been removed');
+            map.removeSource('found');
+            console.log('found source has been removed');
         }
+    }
+
+    function foundLassoFeatures(fpolygonsArr){
+        var foundArr = fpolygonsArr;
+        console.log('fpolygonsArr passed to foundLassoFeatures: '+ foundArr);
+        var fc = turf.featureCollection(foundArr);
+        console.log('fc: '+ JSON.stringify(fc));
+        clearFoundFeatures();
+        histogram_data = [];
 
         if(map.getSource('found')){
             map.getSource('found').setData({
@@ -85,6 +129,16 @@
         //alert("added found features layer");
     }
 
+    function flatView() {
+        console.log("going to flat view");
+        map.jumpTo({
+            zoom: 16,
+            pitch: 0,
+            bearing: 0
+        });
+    }
+
+
     function isPointInPolygon(point, polygon) {
         const [x, y] = point;
         let inside = false;
@@ -103,7 +157,8 @@
     }
 
     function updateArea(e) {
-        alert("updating info for lasso");
+        // alert("updating info for lasso");
+        var foundFeaturePolygons = [];
 
         const data = draw.getAll();
         const polygonData = data.features[0].geometry.coordinates[0];
@@ -135,7 +190,6 @@
 
         var foundFeatures = 0;
         var foundFeatureUprns = "";
-        var foundFeaturePolygons = [];
         var totalEPC = 0;
         var totalPotentialEPC = 0;
 
@@ -157,16 +211,24 @@
                 console.log("epcObj['geometry']['coordinates'][0]:" + epcObj['geometry']['coordinates'][0]);
 
                 var featureType = epcObj['geometry']['type'];
+                var featObj = epcObj;
                 if(pntInPolygon) {
-                    foundFeatures++;
-                    var featObj = epcObj;
-                    foundFeaturePolygons.push(featObj);
-                    foundFeatureUprns += epcObj['properties'].UPRN+"\n";
-                    totalEPC += parseInt(epcObj['properties']['current-energy-efficiency']);
-                    totalPotentialEPC += parseInt(epcObj['properties']['potential-energy-efficiency']);
-                    console.log("Feature UPRN: "+ epcObj['properties'].UPRN + " ("+featureType+") is inside boundary");
+                    var splitFoundUprns = foundFeatureUprns.split('\n');
+                    console.log("Already found: " + JSON.stringify(splitFoundUprns));
+                    var currUprn = featObj['properties'].UPRN;
+                    console.log("Already found " + currUprn + ": "+ splitFoundUprns.includes(currUprn));
+                    if(!splitFoundUprns.includes(currUprn)){
+                        foundFeatures++;
+                        foundFeaturePolygons.push(featObj);
+                        foundFeatureUprns += currUprn + "\n";
+                        totalEPC += parseInt(featObj['properties']['current-energy-efficiency']);
+                        totalPotentialEPC += parseInt(featObj['properties']['potential-energy-efficiency']);
+                        console.log("Feature UPRN: "+ featObj['properties'].UPRN + " ("+featureType+") is inside boundary");
+                    }else{
+                        console.log(currUprn + " already in found array");
+                    }
                 }else {
-                    console.log("Feature UPRN: "+ epcObj['properties'].UPRN + " ("+featureType+") not inside boundary");
+                    console.log("Feature UPRN: "+ featObj['properties'].UPRN + " ("+featureType+") not inside boundary");
                 }
 
             }
@@ -197,9 +259,10 @@
     mapDiv.appendChild(document.getElementById("control-panel"));
     mapDiv.appendChild(document.getElementById("menu"));
     mapDiv.appendChild(document.getElementById("loader"));
+    mapDiv.appendChild(document.getElementById("side-panel-btn"));
+    mapDiv.appendChild(document.getElementById("info-pane"));
+    mapDiv.appendChild(document.getElementById("info-pane-btn"));
     const menuDiv = document.getElementById('menu');
-    // mapDiv.appendChild(document.getElementById("calculation-box"));
-
 
     const layerList = document.getElementById('menu');
     const inputs = layerList.getElementsByTagName('input');
@@ -261,9 +324,9 @@
     });
 
     // Add zoom and rotation controls to the map.
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
     // Add fullscreen option
-    map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+    map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
     map.on('styledata', () => {
         map.addSource('epc', {
@@ -358,6 +421,15 @@
         */
         });
 
+        function startSpinner() {
+            document.getElementById("loader").style.visibility = "visible";
+            map.on('idle', stopSpinner);
+        }
+
+        window.onload = function() {
+            startSpinner();
+        };
+
         stopSpinner = (e) => {
             console.log('stop spinner')
             document.getElementById("loader").style.visibility = "hidden";
@@ -439,48 +511,81 @@
             });
         });
 
-       /* map.jumpTo({
-            pitch: 0
-        }); */
     });
-        $(document).ready(function(){
 
-            var mc = {
-                '0-20'    : 'epc_g',
-                '21-37'   : 'epc_f',
-                '38-54'   : 'epc_e',
-                '55-68'   : 'epc_d',
-                '69-80'   : 'epc_c',
-                '81-91'   : 'epc_b',
-                '92-100'  : 'epc_a'
-            };
+    $(document).ready(function(){
 
-            function between(x, min, max) {
-                return x >= min && x <= max;
-            }
+        $('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
+        $('.mapbox-gl-draw_polygon').click(function(){
+            flatView();
+            $('#control-panel').show();
+            $('#collapse2').collapse('show');
+        });
+        $( "#menu" ).hide();
+        $('#control-panel').hide();
 
-            var dc;
-            var first;
-            var second;
-            var th;
+        $('#basemap_div').click(function(){
+            $('#menu').toggle('slow');
+        });
 
-            $("#control-panel div span[id*=eff]").on('DOMSubtreeModified', function () {
-                th = $(this);
+        $('.open_panel').click(function(){
+            $('#control-panel').toggle('slow');
+        });
 
-                dc = parseInt($(this).attr('data-color'),10);
+        $('.closebtn').click(function(){
+            $('#control-panel').toggle('slow');
+        });
 
-                $.each(mc, function(name, value){
+        $('.closeinfobtn').click(function(){
+            $('#info-pane').toggle('slow');
+        });
 
-                    first = parseInt(name.split('-')[0],10);
-                    second = parseInt(name.split('-')[1],10);
+        $('#info-pane-btn').click(function(){
+            $('#info-pane').toggle('slow');
+        });
 
-                    //console.log(between(dc, first, second));
 
-                    if( between(dc, first, second) ){
-                        th.attr('class', '');
-                        th.addClass(value);
-                    }
 
-                });
+        var mc = {
+            '0-20'    : 'epc_g',
+            '21-37'   : 'epc_f',
+            '38-54'   : 'epc_e',
+            '55-68'   : 'epc_d',
+            '69-80'   : 'epc_c',
+            '81-91'   : 'epc_b',
+            '92-100'  : 'epc_a'
+        };
+
+        function between(x, min, max) {
+            return x >= min && x <= max;
+        }
+
+        var dc;
+        var first;
+        var second;
+        var th;
+
+        $("#control-panel div span[id*=eff]").on('DOMSubtreeModified', function () {
+            th = $(this);
+
+            dc = parseInt($(this).attr('data-color'),10);
+
+            $.each(mc, function(name, value){
+
+                first = parseInt(name.split('-')[0],10);
+                second = parseInt(name.split('-')[1],10);
+
+                //console.log(between(dc, first, second));
+
+                if( between(dc, first, second) ){
+                    th.attr('class', '');
+                    th.addClass(value);
+                }
+
             });
         });
+
+        $('#exampleModal').on('shown.bs.modal', function () {
+          $('#modal-title').trigger('focus')
+        })
+    });
