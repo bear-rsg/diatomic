@@ -133,7 +133,44 @@
     </div>
 </div>
 <body>
-    <div class="panel-group" id="accordion">
+    <button id="side-panel-btn" class="open_panel">☰</button>
+    <div id="map"></div>
+    <!--  insert this after load into position at top-left block -->
+    <div id="basemap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Change basemap"><img alt="Change basemap" class="basemap" style="padding:3px;margin-left: 2px;" src="/static/images/basemap.svg" width="25" height="25"></button></div>
+    <div id="menu">
+        <input id="satellite-streets-v12" type="radio" name="rtoggle" value="satellite" checked="checked">
+        <!-- See a list of Mapbox-hosted public styles at -->
+        <!-- https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
+        <label for="satellite-streets-v12">satellite streets</label>
+        <input id="light-v11" type="radio" name="rtoggle" value="light">
+        <label for="light-v11">light</label>
+        <input id="dark-v11" type="radio" name="rtoggle" value="dark" checked="checked">
+        <label for="dark-v11">dark</label>
+        <input id="streets-v12" type="radio" name="rtoggle" value="streets">
+        <label for="streets-v12">streets</label>
+        <input id="outdoors-v12" type="radio" name="rtoggle" value="outdoors">
+        <label for="outdoors-v12">outdoors</label>
+    </div>
+    <div id="info-pane">
+        <a href="javascript:void(0)" style="float: right;" class="closeinfobtn">×</a>
+        <img class="epc responsive" src="/static/images/epc_ratings.png" alt="EPC Ratings">
+    </div>
+    <button id="info-pane-btn" class="open_info"></button>
+    <div id="control-panel" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn">×</a>
+        <!-- img class="epc responsive" src="{% static 'images/epc_ratings.png' %}" alt="EPC Ratings" /-->
+        <!--div class="ctl-subtitle">Selected item:</div>
+        <div><strong>Current efficiency:</strong>&nbsp;<span id="cur-eff" class=""></span></div>
+        <div><strong>Potential efficiency:</strong>&nbsp;<span id="pot-eff" class=""></span></div>
+        <div><strong>UPRN:</strong>&nbsp;<span id="uprn"></span></div>
+        <hr>
+        <div class="ctl-subtitle">Lasso area:</div>
+        <div><strong>Avg efficiency:</strong>&nbsp;<span id="avg-eff" class=""></span></div>
+        <div><strong>Avg potential:</strong>&nbsp;<span id="avg-pot-eff" class=""></span></div>
+        <hr>
+        <div class="ctl-subtitle">Overview:</div>
+        <canvas id="myChart"></canvas -->
+        <div class="panel-group" id="accordion">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title ctl-subtitle">
