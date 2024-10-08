@@ -1,5 +1,4 @@
-
-    const {MapboxOverlay} = deck;
+  const {MapboxOverlay} = deck;
 
     // Get a mapbox API access token
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbHllbHc0c24wM2V4MnJzYjd6d3NhcDQ5In0.NqG44ctju4Fm25dTP8GqZQ';
@@ -94,13 +93,93 @@
         }
     }
 
+    function buildHistogramData(foundSrcFeat, histType){
+
+        var sum_efficiency_a = 0;
+        var sum_efficiency_b = 0;
+        var sum_efficiency_c = 0;
+        var sum_efficiency_d = 0;
+        var sum_efficiency_e = 0;
+        var sum_efficiency_f = 0;
+        var sum_efficiency_g = 0;
+
+        var perc_efficiency_a = 0;
+        var perc_efficiency_b = 0;
+        var perc_efficiency_c = 0;
+        var perc_efficiency_d = 0;
+        var perc_efficiency_e = 0;
+        var perc_efficiency_g = 0;
+
+        var count = foundSrcFeat.length;
+        console.log('foundSrcFeat:' + JSON.stringify(foundSrcFeat));
+        if(count > 0){
+            console.log(count);
+            for(var i=0;i<count;i++){
+                var histObj = foundSrcFeat[i]; // features
+                console.log('histObj:' + JSON.stringify(histObj));
+                console.log('histType: '+ histType);
+                var histVal = '-1';
+                if(histType == 'current-energy-efficiency'){
+                    histVal = histObj['properties']['current-energy-efficiency'];
+                }
+                if(histType == 'potential-energy-efficiency'){
+                    histVal = histObj['properties']['potential-energy-efficiency'];
+                }
+                console.log('histVal: ' + histVal);
+
+                if(histVal >=0 && histVal <= 20) { sum_efficiency_g++; }
+                if(histVal >=21 && histVal <= 38) { sum_efficiency_f++; }
+                if(histVal >=39 && histVal <= 54) { sum_efficiency_e++; }
+                if(histVal >=55 && histVal <= 68) { sum_efficiency_d++; }
+                if(histVal >=69 && histVal <= 80) { sum_efficiency_c++; }
+                if(histVal >=81 && histVal <= 90) { sum_efficiency_b++; }
+                if(histVal >=91 ) { sum_efficiency_a++; }
+
+                console.log('sum_efficiency_a: ' + sum_efficiency_a);
+                console.log('sum_efficiency_b: ' + sum_efficiency_b);
+                console.log('sum_efficiency_c: ' + sum_efficiency_c);
+                console.log('sum_efficiency_d: ' + sum_efficiency_d);
+                console.log('sum_efficiency_e: ' + sum_efficiency_e);
+                console.log('sum_efficiency_f: ' + sum_efficiency_f);
+                console.log('sum_efficiency_g: ' + sum_efficiency_g);
+            }
+
+            var perc_eff_a = sum_efficiency_a/count;
+            var perc_eff_b = sum_efficiency_b/count;
+            var perc_eff_c = sum_efficiency_c/count;
+            var perc_eff_d = sum_efficiency_d/count;
+            var perc_eff_e = sum_efficiency_e/count;
+            var perc_eff_f = sum_efficiency_f/count;
+            var perc_eff_g = sum_efficiency_g/count;
+
+            return [
+                {x: 0, y: perc_eff_g },
+                {x: 21, y: perc_eff_f },
+                {x: 39, y: perc_eff_e },
+                {x: 55, y: perc_eff_d },
+                {x: 69, y: perc_eff_c },
+                {x: 81, y: perc_eff_b },
+                {x: 91, y: perc_eff_a }
+            ];
+        } else {
+                return [
+                    {x: 0, y: 0 },
+                    {x: 21, y: 0 },
+                    {x: 39, y: 0 },
+                    {x: 55, y: 0 },
+                    {x: 69, y: 0 },
+                    {x: 81, y: 0 },
+                    {x: 91, y: 0 }
+                ];
+        }
+    }
+
     function foundLassoFeatures(fpolygonsArr){
         var foundArr = fpolygonsArr;
         console.log('fpolygonsArr passed to foundLassoFeatures: '+ foundArr);
         var fc = turf.featureCollection(foundArr);
         console.log('fc: '+ JSON.stringify(fc));
         clearFoundFeatures();
-        histogram_data = [];
 
         if(map.getSource('found')){
             map.getSource('found').setData({
@@ -126,13 +205,16 @@
             }
         });
 
+        var histogram_current_data_a = [];
+        var histogram_potential_data = [];
+
         //alert("added found features layer");
     }
 
     function flatView() {
         console.log("going to flat view");
         map.jumpTo({
-            zoom: 16,
+            //zoom: 16,
             pitch: 0,
             bearing: 0
         });
@@ -364,6 +446,8 @@
     });
 
     map.on('click', 'epc-layer', (e) => {
+        $('#control-panel').show();
+        $('#collapse1').collapse('show');
 
         const features = e.features[0];
         console.log("features(all): "+ JSON.stringify(features));
@@ -442,42 +526,72 @@
         });
 
         map.on('idle', (e) => {
-            const data = [
+
+            var foundSourceFeatures = [];
+            if(map.getLayer('found-layer')){
+                foundSourceFeatures = map.queryRenderedFeatures({layers: ['found-layer']});
+                $('#collapse3').collapse('show');
+            }else{
+                foundSourceFeatures = map.queryRenderedFeatures({layers: ['epc-layer']});
+            }
+
+            /*
+            const hist_data = [ // display values
                 {x: 30, y: 10},
                 {x: 50, y: 20},
                 {x: 70, y: 70},
                 {x: 80, y: 80},
                 {x: 90, y: 10}
             ];
+            */
 
-            const bgroundColour = [];
-            const labelValues = [];
-            for(i=0; i < data.length; i++) {
-                if(data[i].x >=0 && data[i].x <= 20) { bgroundColour.push('hsl(357,82%,53%)') }
-                if(data[i].x >=21 && data[i].x <= 38) { bgroundColour.push('hsl(20,87%,56%)') }
-                if(data[i].x >=39 && data[i].x <= 54) { bgroundColour.push('hsl(38,91%,59%)') }
-                if(data[i].x >=55 && data[i].x <= 68) { bgroundColour.push('hsl(58,87%,58%)') }
-                if(data[i].x >=69 && data[i].x <= 80) { bgroundColour.push('hsl(87,53%,56%)') }
-                if(data[i].x >=81 && data[i].x <= 91) { bgroundColour.push('hsl(150,86%,28%)') }
-                if(data[i].x >=92 && data[i].x <= 100) { bgroundColour.push('hsl(214,45%,49%)') }
-                labelValues.push(data[i].x)
+            const hist_eff_data = buildHistogramData(foundSourceFeatures, 'current-energy-efficiency');
+            const hist_pot_data = buildHistogramData(foundSourceFeatures, 'potential-energy-efficiency');
+            
+            const currBgroundColour = [];
+            const currLabelValues = [];
+           
+            for(i=0; i < hist_eff_data.length; i++) {
+                if(hist_eff_data[i].x >=0 && hist_eff_data[i].x <= 20) { currBgroundColour.push('hsl(357,82%,53%)') }
+                if(hist_eff_data[i].x >=21 && hist_eff_data[i].x <= 38) { currBgroundColour.push('hsl(20,87%,56%)') }
+                if(hist_eff_data[i].x >=39 && hist_eff_data[i].x <= 54) { currBgroundColour.push('hsl(38,91%,59%)') }
+                if(hist_eff_data[i].x >=55 && hist_eff_data[i].x <= 68) { currBgroundColour.push('hsl(58,87%,58%)') }
+                if(hist_eff_data[i].x >=69 && hist_eff_data[i].x <= 80) { currBgroundColour.push('hsl(87,53%,56%)') }
+                if(hist_eff_data[i].x >=81 && hist_eff_data[i].x <= 91) { currBgroundColour.push('hsl(150,86%,28%)') }
+                if(hist_eff_data[i].x >=92 && hist_eff_data[i].x <= 100) { currBgroundColour.push('hsl(214,45%,49%)') }
+                currLabelValues.push(hist_eff_data[i].x)
             }
-            console.log(labelValues)
-
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var chart = new Chart(ctx, {
+            console.log('currLabelValues: '+currLabelValues);
+            
+            const potBgroundColour = [];
+            const potLabelValues = [];
+           
+            for(i=0; i < hist_pot_data.length; i++) {
+                if(hist_pot_data[i].x >=0 && hist_pot_data[i].x <= 20) { potBgroundColour.push('hsl(357,82%,53%)') }
+                if(hist_pot_data[i].x >=21 && hist_pot_data[i].x <= 38) { potBgroundColour.push('hsl(20,87%,56%)') }
+                if(hist_pot_data[i].x >=39 && hist_pot_data[i].x <= 54) { potBgroundColour.push('hsl(38,91%,59%)') }
+                if(hist_pot_data[i].x >=55 && hist_pot_data[i].x <= 68) { potBgroundColour.push('hsl(58,87%,58%)') }
+                if(hist_pot_data[i].x >=69 && hist_pot_data[i].x <= 80) { potBgroundColour.push('hsl(87,53%,56%)') }
+                if(hist_pot_data[i].x >=81 && hist_pot_data[i].x <= 91) { potBgroundColour.push('hsl(150,86%,28%)') }
+                if(hist_pot_data[i].x >=92 && hist_pot_data[i].x <= 100) { potBgroundColour.push('hsl(214,45%,49%)') }
+                potLabelValues.push(hist_pot_data[i].x)
+            }
+            console.log('potLabelValues: '+potLabelValues);
+            
+            var eff_ctx = document.getElementById('effChart').getContext('2d');
+            var chart1 = new Chart(eff_ctx, {
                 // The type of chart we want to create
                 type: 'bar',
                 // The data for our dataset
                 data: {
-                    labels: ['0', '20', '40', '60', '80', '100' ],
+                    labels: ['G', 'F', 'E', 'D', 'C', 'B', 'A' ],
                     datasets: [{
-                        label: 'Histogram',
+                        label: 'Current Efficiency',
                         barPercentage: 1,
                         categoryPercentage: 0.8,
-                        data: data,
-                        backgroundColor: bgroundColour,
-                        borderColor: bgroundColour,
+                        data: hist_eff_data,
+                        backgroundColor: currBgroundColour,
+                        borderColor: currBgroundColour,
 
                     }]
                 },
@@ -496,7 +610,53 @@
                             },
                             title: {
                                 display: true,
-                                text: 'RdSAP value'
+                                text: 'Category'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '#'
+                            }
+                        }
+                    }
+                }
+            });
+
+            var pot_ctx = document.getElementById('potChart').getContext('2d');
+            var chart2 = new Chart(pot_ctx, {
+                // The type of chart we want to create
+                type: 'bar',
+                // The data for our dataset
+                data: {
+                    labels: ['G', 'F', 'E', 'D', 'C', 'B', 'A' ],
+                    datasets: [{
+                        label: 'Potential Efficiency',
+                        barPercentage: 1,
+                        categoryPercentage: 0.8,
+                        data: hist_pot_data,
+                        backgroundColor: potBgroundColour,
+                        borderColor: potBgroundColour,
+
+                    }]
+                },
+
+                // Configuration options go here
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            offset: false,
+                            grid: {
+                                offset: false
+                            },
+                            ticks: {
+                                stepSize: 1
+                            },
+                            title: {
+                                display: true,
+                                text: 'Category'
                             }
                         },
                         y: {
