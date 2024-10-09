@@ -1,4 +1,4 @@
-  const {MapboxOverlay} = deck;
+    const {MapboxOverlay} = deck;
 
     // Get a mapbox API access token
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbHllbHc0c24wM2V4MnJzYjd6d3NhcDQ5In0.NqG44ctju4Fm25dTP8GqZQ';
@@ -6,8 +6,6 @@
     // Initialize mapbox map
     const map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/dark-v11',
-        // style: 'mapbox://styles/mapbox/satellite-streets-v12',
-//        center: [-1.833550, 52.456540],
         center: [-1.8802233550562848, 52.46858250430878],
         zoom: 16,
         pitch: 75,
@@ -16,21 +14,45 @@
         antialias: true
 
     });
+
     map.addControl(
         new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,
-
-    // Limit seach results to the UK.
+            // Limit seach results to the UK.
             countries: 'gb',
-    // Use a bounding box to further limit results
-    // to the geographic bounds representing East Birmingham
+            // Use a bounding box to further limit results
+            // to the geographic bounds representing East Birmingham
             bbox: [-1.9285,52.4604,-1.8557,52.4952],
             mapboxgl: mapboxgl
         }), 'top-left'
     );
 
 
-    const months = [
+    var changed_vals = true;
+
+    function flatView() {
+        console.log("going to flat view");
+        map.jumpTo({
+            pitch: 0,
+            bearing: 0
+        });
+        return;
+    }
+
+    function setChanged(opt){
+        if(opt==1){
+            changed_vals = true;
+        }else{
+            changed_vals = false;
+        }
+        console.log('changing changed_vals to ' + opt);
+    }
+
+    function getChanged(){
+       return changed_vals;
+    }
+
+    /* const months = [
         'January',
         'February',
         'March',
@@ -52,7 +74,7 @@
 
         // Set the label to the month
         document.getElementById('month').textContent = months[month];
-    }
+    } */
 
     const draw = new MapboxDraw({
         displayControlsDefault: false,
@@ -60,7 +82,7 @@
         controls: {
             polygon: true,
             trash: true
-        },
+        }
         // Set mapbox-gl-draw to draw by default.
         // The user does not have to click the polygon control button first.
         // defaultMode: 'draw_polygon'
@@ -91,6 +113,7 @@
             map.removeSource('found');
             console.log('found source has been removed');
         }
+        return;
     }
 
     function buildHistogramData(foundSrcFeat, histType){
@@ -111,21 +134,25 @@
         var perc_efficiency_g = 0;
 
         var count = foundSrcFeat.length;
-        console.log('foundSrcFeat:' + JSON.stringify(foundSrcFeat));
+        var eff_count = 0;
+        //console.log('foundSrcFeat:' + JSON.stringify(foundSrcFeat));
+
         if(count > 0){
             console.log(count);
             for(var i=0;i<count;i++){
                 var histObj = foundSrcFeat[i]; // features
-                console.log('histObj:' + JSON.stringify(histObj));
-                console.log('histType: '+ histType);
+                //console.log('histObj:' + JSON.stringify(histObj));
+                //console.log('histType: '+ histType);
                 var histVal = '-1';
                 if(histType == 'current-energy-efficiency'){
                     histVal = histObj['properties']['current-energy-efficiency'];
+                    eff_count++;
                 }
                 if(histType == 'potential-energy-efficiency'){
                     histVal = histObj['properties']['potential-energy-efficiency'];
+                    eff_count++;
                 }
-                console.log('histVal: ' + histVal);
+                //console.log('histVal: ' + histVal);
 
                 if(histVal >=0 && histVal <= 20) { sum_efficiency_g++; }
                 if(histVal >=21 && histVal <= 38) { sum_efficiency_f++; }
@@ -135,22 +162,22 @@
                 if(histVal >=81 && histVal <= 90) { sum_efficiency_b++; }
                 if(histVal >=91 ) { sum_efficiency_a++; }
 
-                console.log('sum_efficiency_a: ' + sum_efficiency_a);
-                console.log('sum_efficiency_b: ' + sum_efficiency_b);
-                console.log('sum_efficiency_c: ' + sum_efficiency_c);
-                console.log('sum_efficiency_d: ' + sum_efficiency_d);
-                console.log('sum_efficiency_e: ' + sum_efficiency_e);
-                console.log('sum_efficiency_f: ' + sum_efficiency_f);
-                console.log('sum_efficiency_g: ' + sum_efficiency_g);
+                //console.log('sum_efficiency_a: ' + sum_efficiency_a);
+                //console.log('sum_efficiency_b: ' + sum_efficiency_b);
+                //console.log('sum_efficiency_c: ' + sum_efficiency_c);
+                //console.log('sum_efficiency_d: ' + sum_efficiency_d);
+                //console.log('sum_efficiency_e: ' + sum_efficiency_e);
+                //console.log('sum_efficiency_f: ' + sum_efficiency_f);
+                //console.log('sum_efficiency_g: ' + sum_efficiency_g);
             }
 
-            var perc_eff_a = sum_efficiency_a/count;
-            var perc_eff_b = sum_efficiency_b/count;
-            var perc_eff_c = sum_efficiency_c/count;
-            var perc_eff_d = sum_efficiency_d/count;
-            var perc_eff_e = sum_efficiency_e/count;
-            var perc_eff_f = sum_efficiency_f/count;
-            var perc_eff_g = sum_efficiency_g/count;
+            var perc_eff_a = (sum_efficiency_a/eff_count)*100;
+            var perc_eff_b = (sum_efficiency_b/eff_count)*100;
+            var perc_eff_c = (sum_efficiency_c/eff_count)*100;
+            var perc_eff_d = (sum_efficiency_d/eff_count)*100;
+            var perc_eff_e = (sum_efficiency_e/eff_count)*100;
+            var perc_eff_f = (sum_efficiency_f/eff_count)*100;
+            var perc_eff_g = (sum_efficiency_g/eff_count)*100;
 
             return [
                 {x: 0, y: perc_eff_g },
@@ -161,16 +188,6 @@
                 {x: 81, y: perc_eff_b },
                 {x: 91, y: perc_eff_a }
             ];
-        } else {
-                return [
-                    {x: 0, y: 0 },
-                    {x: 21, y: 0 },
-                    {x: 39, y: 0 },
-                    {x: 55, y: 0 },
-                    {x: 69, y: 0 },
-                    {x: 81, y: 0 },
-                    {x: 91, y: 0 }
-                ];
         }
     }
 
@@ -205,19 +222,7 @@
             }
         });
 
-        var histogram_current_data_a = [];
-        var histogram_potential_data = [];
-
         //alert("added found features layer");
-    }
-
-    function flatView() {
-        console.log("going to flat view");
-        map.jumpTo({
-            //zoom: 16,
-            pitch: 0,
-            bearing: 0
-        });
     }
 
 
@@ -266,7 +271,7 @@
             console.log("no epc data found");
             return;
         }else{
-            console.log("epcRenderedFeatures length: "+featureSet.length)
+            console.log("epcRenderedFeatures length: "+featureSet.length);
             // console.log("epc data found: " + JSON.stringify(featureSet[0]['geometry']['coordinates']));
         }
 
@@ -334,6 +339,7 @@
         foundLassoFeatures(foundFeaturePolygons);
         //alert("polygonData: "+polygonData+"\n\nfoundFeatureUprns: \n\n" + foundFeatureUprns + "");
         alert("Found Feature Uprns: \n\n" + foundFeatureUprns + "");
+        setChanged(1);
 
     }
 
@@ -344,6 +350,7 @@
     mapDiv.appendChild(document.getElementById("side-panel-btn"));
     mapDiv.appendChild(document.getElementById("info-pane"));
     mapDiv.appendChild(document.getElementById("info-pane-btn"));
+    mapDiv.appendChild(document.getElementById("exampleModal"));
     const menuDiv = document.getElementById('menu');
 
     const layerList = document.getElementById('menu');
@@ -356,81 +363,10 @@
         };
     }
 
-    map.on('style.load', () => {
-        // Insert the layer beneath any symbol layer.
-        const layers = map.getStyle().layers;
-        const labelLayerId = layers.find(
-            (layer) => layer.type === 'symbol' && layer.layout['text-field']
-        ).id;
-
-        // The 'building' layer in the Mapbox Streets
-        // vector tileset contains building height data
-        // from OpenStreetMap.
-        map.addLayer(
-            {
-                'id': 'add-3d-buildings',
-                'source': 'composite',
-                'source-layer': 'building',
-                'filter': ['==', 'extrude', 'true'],
-                'type': 'fill-extrusion',
-                'minzoom': 15,
-                'paint': {
-                    'fill-extrusion-color': '#e8f3f7',
-
-                    // Use an 'interpolate' expression to
-                    // add a smooth transition effect to
-                    // the buildings as the user zooms in.
-                    'fill-extrusion-height': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        15,
-                        0,
-                        15.05,
-                        ['get', 'height']
-                    ],
-                    'fill-extrusion-base': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        15,
-                        0,
-                        15.05,
-                        ['get', 'min_height']
-                    ],
-                    'fill-extrusion-opacity': 0.85
-                }
-            },
-            labelLayerId
-        );
-    });
-
     // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl(), 'top-left');
     // Add fullscreen option
     map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
-
-    map.on('styledata', () => {
-        map.addSource('epc', {
-        type: 'geojson',
-        // Use a URL for the value for the `data` property.
-        data: 'https://bear-rsg.github.io/diatomic/js/wmca_epc_data.geojson'
-    });
-
-    map.addLayer({
-        'id': 'epc-layer',
-        'source': 'epc',
-        'type': 'fill-extrusion',
-        'paint': {
-        //'fill-extrusion-color': '#52be80',
-        'fill-extrusion-color': {
-            property: 'current-energy-efficiency',
-            stops: [[0, '#d4340d'], [21, '#f18421'], [38, '#f8b368'], [55, '#f0c713'], [69, '#8cc637'], [81, '#1bb359'], [92, '#02895d']]
-        },
-        'fill-extrusion-height': 15,
-        'fill-extrusion-opacity': 0.8,
-        },
-    });
 
     //const epcSrcFeatures = map.querySourceFeatures('epc', {filter: ["==", "72", e.features[0].properties.current-energy-efficiency]});
     //console.log("epc source data found: " + JSON.stringify(epcSrcFeatures));
@@ -446,6 +382,7 @@
     });
 
     map.on('click', 'epc-layer', (e) => {
+
         $('#control-panel').show();
         $('#collapse1').collapse('show');
 
@@ -503,29 +440,104 @@
             .setHTML('<h3>EPC Info</h3><p>' + msg + '</p>')
             .addTo(map);
         */
-        });
 
-        function startSpinner() {
-            document.getElementById("loader").style.visibility = "visible";
-            map.on('idle', stopSpinner);
+    });
+
+    function startSpinner() {
+        document.getElementById("loader").style.visibility = "visible";
+        map.on('idle', stopSpinner);
+    }
+
+    stopSpinner = (e) => {
+        console.log('stop spinner');
+        document.getElementById("loader").style.visibility = "hidden";
+        map.off('idle', stopSpinner);
+        setChanged(1);
+    }
+
+    map.on('styledata', () => {
+        document.getElementById("loader").style.visibility = "visible";
+        if(!map.getSource('epc')){
+            map.addSource('epc', {
+                type: 'geojson',
+                // Use a URL for the value for the `data` property.
+        data: 'https://bear-rsg.github.io/diatomic/js/wmca_epc_data.geojson'
+    });
+
+            map.addLayer({
+                'id': 'epc-layer',
+                'source': 'epc',
+                'type': 'fill-extrusion',
+                'paint': {
+                    //'fill-extrusion-color': '#52be80',
+                    'fill-extrusion-color': {
+                        property: 'current-energy-efficiency',
+                        stops: [[0, '#d4340d'], [21, '#f18421'], [38, '#f8b368'], [55, '#f0c713'], [69, '#8cc637'], [81, '#1bb359'], [92, '#02895d']]
+                    },
+                    'fill-extrusion-height': 15,
+                    'fill-extrusion-opacity': 0.8,
+                }
+            });
         }
+        map.on('idle', stopSpinner);
+    });
 
-        window.onload = function() {
-            startSpinner();
-        };
+    map.on('style.load', () => {
+        // Insert the layer beneath any symbol layer.
+        const layers = map.getStyle().layers;
+        const labelLayerId = layers.find(
+            (layer) => layer.type === 'symbol' && layer.layout['text-field']
+        ).id;
 
-        stopSpinner = (e) => {
-            console.log('stop spinner')
-            document.getElementById("loader").style.visibility = "hidden";
-            map.off('idle', stopSpinner)
-        }
+        // The 'building' layer in the Mapbox Streets
+        // vector tileset contains building height data
+        // from OpenStreetMap.
+        map.addLayer(
+            {
+                'id': 'add-3d-buildings',
+                'source': 'composite',
+                'source-layer': 'building',
+                'filter': ['==', 'extrude', 'true'],
+                'type': 'fill-extrusion',
+                'minzoom': 15,
+                'paint': {
+                    'fill-extrusion-color': '#e8f3f7',
 
-        map.on('styledata', () => {
-            document.getElementById("loader").style.visibility = "visible";
-            map.on('idle', stopSpinner);
-        });
+                    // Use an 'interpolate' expression to
+                    // add a smooth transition effect to
+                    // the buildings as the user zooms in.
+                    'fill-extrusion-height': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        15,
+                        0,
+                        15.05,
+                        ['get', 'height']
+                    ],
+                    'fill-extrusion-base': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        15,
+                        0,
+                        15.05,
+                        ['get', 'min_height']
+                    ],
+                    'fill-extrusion-opacity': 0.85
+                }
+            },
+            labelLayerId
+        );
+    });
 
-        map.on('idle', (e) => {
+    window.onload = function() {
+        startSpinner();
+    };
+
+    map.on('idle', (e) => {
+
+        if(getChanged()){
 
             var foundSourceFeatures = [];
             if(map.getLayer('found-layer')){
@@ -535,22 +547,12 @@
                 foundSourceFeatures = map.queryRenderedFeatures({layers: ['epc-layer']});
             }
 
-            /*
-            const hist_data = [ // display values
-                {x: 30, y: 10},
-                {x: 50, y: 20},
-                {x: 70, y: 70},
-                {x: 80, y: 80},
-                {x: 90, y: 10}
-            ];
-            */
-
             const hist_eff_data = buildHistogramData(foundSourceFeatures, 'current-energy-efficiency');
             const hist_pot_data = buildHistogramData(foundSourceFeatures, 'potential-energy-efficiency');
-            
+
             const currBgroundColour = [];
             const currLabelValues = [];
-           
+
             for(i=0; i < hist_eff_data.length; i++) {
                 if(hist_eff_data[i].x >=0 && hist_eff_data[i].x <= 20) { currBgroundColour.push('hsl(357,82%,53%)') }
                 if(hist_eff_data[i].x >=21 && hist_eff_data[i].x <= 38) { currBgroundColour.push('hsl(20,87%,56%)') }
@@ -559,13 +561,13 @@
                 if(hist_eff_data[i].x >=69 && hist_eff_data[i].x <= 80) { currBgroundColour.push('hsl(87,53%,56%)') }
                 if(hist_eff_data[i].x >=81 && hist_eff_data[i].x <= 91) { currBgroundColour.push('hsl(150,86%,28%)') }
                 if(hist_eff_data[i].x >=92 && hist_eff_data[i].x <= 100) { currBgroundColour.push('hsl(214,45%,49%)') }
-                currLabelValues.push(hist_eff_data[i].x)
+                currLabelValues.push(hist_eff_data[i].x);
             }
-            console.log('currLabelValues: '+currLabelValues);
-            
+            //console.log('currLabelValues: '+currLabelValues);
+
             const potBgroundColour = [];
             const potLabelValues = [];
-           
+
             for(i=0; i < hist_pot_data.length; i++) {
                 if(hist_pot_data[i].x >=0 && hist_pot_data[i].x <= 20) { potBgroundColour.push('hsl(357,82%,53%)') }
                 if(hist_pot_data[i].x >=21 && hist_pot_data[i].x <= 38) { potBgroundColour.push('hsl(20,87%,56%)') }
@@ -574,10 +576,10 @@
                 if(hist_pot_data[i].x >=69 && hist_pot_data[i].x <= 80) { potBgroundColour.push('hsl(87,53%,56%)') }
                 if(hist_pot_data[i].x >=81 && hist_pot_data[i].x <= 91) { potBgroundColour.push('hsl(150,86%,28%)') }
                 if(hist_pot_data[i].x >=92 && hist_pot_data[i].x <= 100) { potBgroundColour.push('hsl(214,45%,49%)') }
-                potLabelValues.push(hist_pot_data[i].x)
+                potLabelValues.push(hist_pot_data[i].x);
             }
-            console.log('potLabelValues: '+potLabelValues);
-            
+            //console.log('potLabelValues: '+potLabelValues);
+
             var eff_ctx = document.getElementById('effChart').getContext('2d');
             var chart1 = new Chart(eff_ctx, {
                 // The type of chart we want to create
@@ -598,26 +600,20 @@
 
                 // Configuration options go here
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            bottom: 16
+                        }
+                    },
                     scales: {
-                        x: {
-                            type: 'linear',
-                            offset: false,
-                            grid: {
-                                offset: false
-                            },
-                            ticks: {
-                                stepSize: 1
-                            },
-                            title: {
-                                display: true,
-                                text: 'Category'
-                            }
-                        },
                         y: {
                             beginAtZero: true,
+                            type: 'linear',
                             title: {
                                 display: true,
-                                text: '#'
+                                text: '%'
                             }
                         }
                     }
@@ -644,43 +640,40 @@
 
                 // Configuration options go here
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            bottom: 16
+                        }
+                    },
                     scales: {
-                        x: {
-                            type: 'linear',
-                            offset: false,
-                            grid: {
-                                offset: false
-                            },
-                            ticks: {
-                                stepSize: 1
-                            },
-                            title: {
-                                display: true,
-                                text: 'Category'
-                            }
-                        },
                         y: {
                             beginAtZero: true,
+                            type: 'linear',
                             title: {
                                 display: true,
-                                text: '#'
+                                text: '%'
                             }
                         }
                     }
                 }
             });
-        });
 
+            setChanged(0);
+        }
     });
 
     $(document).ready(function(){
 
-        $('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
-        $('.mapbox-gl-draw_polygon').click(function(){
+        $('.mapbox-gl-draw_ctrl-draw-btn').on("mousedown", function() {
             flatView();
             $('#control-panel').show();
             $('#collapse2').collapse('show');
         });
+
+        $('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
+
         $( "#menu" ).hide();
         $('#control-panel').hide();
 
@@ -704,6 +697,16 @@
             $('#info-pane').toggle('slow');
         });
 
+        $('#hist_options').change(function(){
+            selected_value = $("input[name='chart_type']:checked").val();
+            if(selected_value == 'eff'){
+                $('#effChart').removeClass('hidden');
+                $('#potChart').addClass('hidden');
+            }else{
+                $('#potChart').removeClass('hidden');
+                $('#effChart').addClass('hidden');
+            }
+        });
 
 
         var mc = {
@@ -737,7 +740,7 @@
 
                 //console.log(between(dc, first, second));
 
-                if( between(dc, first, second) ){
+                if(between(dc, first, second) ){
                     th.attr('class', '');
                     th.addClass(value);
                 }
@@ -747,5 +750,5 @@
 
         $('#exampleModal').on('shown.bs.modal', function () {
           $('#modal-title').trigger('focus')
-        })
+        });
     });
