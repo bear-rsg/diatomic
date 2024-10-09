@@ -136,7 +136,7 @@
     <button id="side-panel-btn" class="open_panel">☰</button>
     <div id="map"></div>
     <!--  insert this after load into position at top-left block -->
-    <div id="basemap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Change basemap"><img alt="Change basemap" class="basemap" style="padding:3px;margin-left: 2px;" src="./images/basemap.svg" width="25" height="25"></button></div>
+    <div id="basemap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Change basemap"><img alt="Change basemap" class="basemap" style="padding:3px;margin-left: 2px;" src="/static/images/basemap.svg" width="25" height="25"></button></div>
     <div id="menu">
         <input id="satellite-streets-v12" type="radio" name="rtoggle" value="satellite" checked="checked">
         <!-- See a list of Mapbox-hosted public styles at -->
@@ -153,7 +153,7 @@
     </div>
     <div id="info-pane">
         <a href="javascript:void(0)" style="float: right;" class="closeinfobtn">×</a>
-        <img class="epc responsive" src="./images/epc_ratings.png" alt="EPC Ratings">
+        <img class="epc responsive" src="/static/images/epc_ratings.png" alt="EPC Ratings">
     </div>
     <button id="info-pane-btn" class="open_info"></button>
     <div id="control-panel" class="sidebar">
@@ -205,9 +205,14 @@
                 </div>
                 <div id="collapse3" class="panel-collapse collapse">
                     <div class="panel-body">
+                        <div id="hist_options"  class="btn-group" role="group" aria-label="Chart Type">
+                            <input type="radio" id="curr" name="chart_type" value="eff" class="form-check-input" checked="checked">
+                            <label for="curr">Current</label>
+                            <input type="radio" id="pot" name="chart_type" value="pot" class="form-check-input">
+                            <label for="pot">Potential</label>
+                        </div>
                         <canvas id="effChart"></canvas>
-                        <hr>
-                        <canvas id="potChart"></canvas>
+                        <canvas id="potChart" class="hidden"></canvas>
                     </div>
                 </div>
             </div>
