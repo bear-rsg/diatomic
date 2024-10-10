@@ -338,7 +338,7 @@
         // foundLassoFeatures(foundFeaturePolygons);
         foundLassoFeatures(foundFeaturePolygons);
         //alert("polygonData: "+polygonData+"\n\nfoundFeatureUprns: \n\n" + foundFeatureUprns + "");
-        alert("Found Feature Uprns: \n\n" + foundFeatureUprns + "");
+        console.log("Found Feature Uprns: \n\n" + foundFeatureUprns + "");
         setChanged(1);
 
     }
@@ -543,8 +543,10 @@
             if(map.getLayer('found-layer')){
                 foundSourceFeatures = map.queryRenderedFeatures({layers: ['found-layer']});
                 $('#collapse3').collapse('show');
+                $('h4.panel-title > a[href="#collapse3"]').text("Lasso values");
             }else{
                 foundSourceFeatures = map.queryRenderedFeatures({layers: ['epc-layer']});
+                $('h4.panel-title > a[href="#collapse3"]').text("Overview (all values)");
             }
 
             const hist_eff_data = buildHistogramData(foundSourceFeatures, 'current-energy-efficiency');
@@ -667,9 +669,11 @@
     $(document).ready(function(){
 
         $('.mapbox-gl-draw_ctrl-draw-btn').on("mousedown", function() {
+            draw.deleteAll();
             flatView();
             $('#control-panel').show();
             $('#collapse2').collapse('show');
+
         });
 
         $('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
