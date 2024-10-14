@@ -780,7 +780,7 @@ const {MapboxOverlay} = deck;
                 $('.modal-body').text(std_content);
            }
 
-            $('#modal-title').trigger('focus')
+            $('#modal-title').trigger('focus');
         });
 
     });
