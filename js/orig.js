@@ -345,7 +345,7 @@
     const mapDiv = document.getElementById('map');
     mapDiv.appendChild(document.getElementById("control-panel"));
     //mapDiv.appendChild(document.getElementById("menu"));
-    mapDiv.appendChild(document.getElementById("loader"));
+    //mapDiv.appendChild(document.getElementById("loader"));
     mapDiv.appendChild(document.getElementById("side-panel-btn"));
     mapDiv.appendChild(document.getElementById("info-pane"));
     mapDiv.appendChild(document.getElementById("info-pane-btn"));
