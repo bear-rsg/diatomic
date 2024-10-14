@@ -1,4 +1,4 @@
-    const {MapboxOverlay} = deck;
+const {MapboxOverlay} = deck;
 
     // Get a mapbox API access token
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbHllbHc0c24wM2V4MnJzYjd6d3NhcDQ5In0.NqG44ctju4Fm25dTP8GqZQ';
@@ -343,13 +343,13 @@
     }
 
     const mapDiv = document.getElementById('map');
-    mapDiv.appendChild(document.getElementById("control-panel"));
-    //mapDiv.appendChild(document.getElementById("menu"));
-    //mapDiv.appendChild(document.getElementById("loader"));
-    //mapDiv.appendChild(document.getElementById("side-panel-btn"));
-    //mapDiv.appendChild(document.getElementById("info-pane"));
-    //mapDiv.appendChild(document.getElementById("info-pane-btn"));
-    //mapDiv.appendChild(document.getElementById("diatomicModal"));
+    mapDiv.appendChild(document.getElementById('control-panel'));
+    mapDiv.appendChild(document.getElementById('menu'));
+    mapDiv.appendChild(document.getElementById('loader'));
+    mapDiv.appendChild(document.getElementById('side-panel-btn'));
+    mapDiv.appendChild(document.getElementById('info-pane'));
+    mapDiv.appendChild(document.getElementById('info-pane-btn'));
+    mapDiv.appendChild(document.getElementById('diatomicModal'));
     const menuDiv = document.getElementById('menu');
 
     const layerList = document.getElementById('menu');
@@ -460,7 +460,7 @@
             map.addSource('epc', {
                 type: 'geojson',
                 // Use a URL for the value for the `data` property.
-                data: 'http://127.0.0.1:8000./js/wmca_epc_data.geojson'
+                data: 'http://127.0.0.1:8000/static/js/wmca_epc_data.geojson'
             });
 
             map.addLayer({
