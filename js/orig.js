@@ -777,17 +777,27 @@ const {MapboxOverlay} = deck;
             var button = $(e.relatedTarget);
             var type = button.attr('data-type');
 
-            var myModal = $(this);
+             var myModal = $(this);
 
             //$("#collapse3 > .panel-body").html();
-            var hist_content = '<div id="hist_options_modal" class="btn-group" role="group" aria-label="Chart Type"><input type="radio" id="curr_modal" name="chart_type" value="eff" class="form-check-input" checked="checked"><label for="curr_modal">Current</label><input type="radio" id="pot" name="chart_type" value="pot" class="form-check-input"><label for="pot">Potential</label></div><canvas id="effChart_modal" style="display: block; height: 269px; width: 243px;" height="403" width="364" class="chartjs-render-monitor"></canvas><canvas id="potChart_modal" class="hidden chartjs-render-monitor" style="display: block; height: 0px; width: 0px;" height="0" width="0"></canvas>';
-            //alert(hist_content);
+            var hist_content = '';
+            var hist_opt = document.querySelector('input[name="chart_type"]:checked').value;
+
+            if(hist_opt == 'eff'){
+                hist_content = document.getElementById('effChart');
+            }
+
+            if(hist_opt == 'pot'){
+                hist_content = document.getElementById('potChart');
+            }
+
+            // var clone = hist_content.cloneNode(true);
+
             var std_content = "My test content";
 
             if(type == 'histogram'){
                 $('.modal-title').text("My Histogram Modal");
                 $('.modal-body').html(hist_content);
-
 
             }else{
                 $('.modal-title').text("My Test Modal");
@@ -797,4 +807,14 @@ const {MapboxOverlay} = deck;
             $('#modal-title').trigger('focus');
         });
 
+        $('#modal-close').on('click', function (e) {
+            var hist_content = '';
+            if($('#diatomicModalBody > #effChart').length != 0){
+                hist_content = document.getElementById('effChart');
+            }
+            if($('#diatomicModalBody > #potChart').length != 0){
+                hist_content = document.getElementById('potChart');
+            }
+            $(hist_content).insertAfter("#hist_options");
+        });
     });
