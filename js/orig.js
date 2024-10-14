@@ -5,7 +5,7 @@
 
     // Initialize mapbox map
     const map = new mapboxgl.Map({
-        style: 'mapbox://styles/mapbox/dark-v11',
+        style: 'mapbox://styles/mapbox/outdoors-v12',
         center: [-1.8802233550562848, 52.46858250430878],
         zoom: 16,
         pitch: 75,
@@ -113,7 +113,6 @@
             map.removeSource('found');
             console.log('found source has been removed');
         }
-        return;
     }
 
     function buildHistogramData(foundSrcFeat, histType){
@@ -350,7 +349,7 @@
     mapDiv.appendChild(document.getElementById("side-panel-btn"));
     mapDiv.appendChild(document.getElementById("info-pane"));
     mapDiv.appendChild(document.getElementById("info-pane-btn"));
-    mapDiv.appendChild(document.getElementById("exampleModal"));
+    mapDiv.appendChild(document.getElementById("diatomicModal"));
     const menuDiv = document.getElementById('menu');
 
     const layerList = document.getElementById('menu');
@@ -396,17 +395,17 @@
         if(features['properties']['current-energy-efficiency']) {
             msg = '' + features['properties']['current-energy-efficiency'];
         }else{
-            msg = 'n/a';
+            msg = '-';
         }
         if(features['properties']['potential-energy-efficiency']) {
             msg2 = '' + features['properties']['potential-energy-efficiency'];
         }else{
-            msg2 = 'n/a';
+            msg2 = '-';
         }
         if(features['properties']['UPRN']) {
             msg3 = '' + features['properties']['UPRN'];
         }else{
-            msg3 = 'n/a';
+            msg3 = '-';
         }
 
 
@@ -421,7 +420,7 @@
                msg4 += msg4_arr[1]+"\n";
             //}
         }else{
-            msg4 = 'n/a';
+            msg4 = '-';
 
         }
         // console.log(msg);
@@ -429,9 +428,9 @@
         const potentialEfficiency = features['properties']['potential-energy-efficiency'];
 
         document.getElementById('cur-eff').innerHTML = msg;
-        document.getElementById('cur-eff').setAttribute('data-color', currentEfficiency);
+        document.getElementById('cur-eff').setAttribute('data-color', msg);
         document.getElementById('pot-eff').innerHTML = msg2;
-        document.getElementById('pot-eff').setAttribute('data-color', potentialEfficiency);
+        document.getElementById('pot-eff').setAttribute('data-color', msg2);
         document.getElementById('uprn').innerHTML = msg3;
 
 
@@ -461,8 +460,8 @@
             map.addSource('epc', {
                 type: 'geojson',
                 // Use a URL for the value for the `data` property.
-        data: 'https://bear-rsg.github.io/diatomic/js/wmca_epc_data.geojson'
-    });
+                data: 'http://127.0.0.1:8000./js/wmca_epc_data.geojson'
+            });
 
             map.addLayer({
                 'id': 'epc-layer',
@@ -606,7 +605,7 @@
                     maintainAspectRatio: false,
                     layout: {
                         padding: {
-                            bottom: 16
+                            bottom: 30
                         }
                     },
                     scales: {
@@ -670,10 +669,18 @@
 
         $('.mapbox-gl-draw_ctrl-draw-btn').on("mousedown", function() {
             draw.deleteAll();
+            $('#avg-eff').text('-');
+            $('#avg-eff').attr('data-color','');
+            $('#avg-pot-eff').text('-');
+            $('#avg-pot-eff').attr('data-color','');
             flatView();
             $('#control-panel').show();
             $('#collapse2').collapse('show');
 
+        });
+
+        $('.mapbox-gl-draw_trash').on("mousedown", function() {
+            clearFoundFeatures();
         });
 
         $('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
@@ -745,14 +752,35 @@
                 //console.log(between(dc, first, second));
 
                 if(between(dc, first, second) ){
-                    th.attr('class', '');
-                    th.addClass(value);
+                    th.attr('class', value);
                 }
 
             });
         });
 
-        $('#exampleModal').on('shown.bs.modal', function () {
-          $('#modal-title').trigger('focus')
+        $('#diatomicModal').on('shown.bs.modal', function (e) {
+
+            var button = $(e.relatedTarget);
+            var type = button.attr('data-type');
+
+            var myModal = $(this);
+
+            //$("#collapse3 > .panel-body").html();
+            var hist_content = '<div id="hist_options_modal" class="btn-group" role="group" aria-label="Chart Type"><input type="radio" id="curr_modal" name="chart_type" value="eff" class="form-check-input" checked="checked"><label for="curr_modal">Current</label><input type="radio" id="pot" name="chart_type" value="pot" class="form-check-input"><label for="pot">Potential</label></div><canvas id="effChart_modal" style="display: block; height: 269px; width: 243px;" height="403" width="364" class="chartjs-render-monitor"></canvas><canvas id="potChart_modal" class="hidden chartjs-render-monitor" style="display: block; height: 0px; width: 0px;" height="0" width="0"></canvas>';
+            //alert(hist_content);
+            var std_content = "My test content";
+
+            if(type == 'histogram'){
+                $('.modal-title').text("My Histogram Modal");
+                $('.modal-body').html(hist_content);
+
+
+            }else{
+                $('.modal-title').text("My Test Modal");
+                $('.modal-body').text(std_content);
+           }
+
+            $('#modal-title').trigger('focus')
         });
+
     });
