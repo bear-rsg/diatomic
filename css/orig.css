@@ -1,6 +1,6 @@
 #menu {
     position: relative;
-    background: #227ba6;
+    background #227ba6;
     padding: 10px;
     font-family: 'Open Sans', sans-serif;
     left: 34vw;
@@ -225,6 +225,10 @@
 
 .hidden {
     visibility: hidden;
+}
+
+.float-right {
+    float: right;
 }
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
