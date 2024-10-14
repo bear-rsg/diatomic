@@ -342,16 +342,28 @@ const {MapboxOverlay} = deck;
 
     }
 
-    const mapDiv = document.getElementById('map');
+        const mapDiv = document.getElementById('map');
     const menuDiv = document.getElementById('menu');
+
     mapDiv.appendChild(document.getElementById('control-panel'));
-    alert(menuDiv);
-    mapDiv.appendChild(menuDiv);
-    mapDiv.appendChild(document.getElementById('loader'));
-    mapDiv.appendChild(document.getElementById('side-panel-btn'));
-    mapDiv.appendChild(document.getElementById('info-pane'));
-    mapDiv.appendChild(document.getElementById('info-pane-btn'));
-    mapDiv.appendChild(document.getElementById('diatomicModal'));
+    if(menuDiv != null){
+        mapDiv.appendChild(menuDiv);
+    }
+    if(document.getElementById('loader') != null){
+        mapDiv.appendChild(document.getElementById('loader'));
+    }
+    if(document.getElementById('side-panel-btn') != null){
+        mapDiv.appendChild(document.getElementById('side-panel-btn'));
+    }
+    if(document.getElementById('info-pane') != null){
+        mapDiv.appendChild(document.getElementById('info-pane'));
+    }
+    if(document.getElementById('info-pane-btn') != null){
+        mapDiv.appendChild(document.getElementById('info-pane-btn'));
+    }
+    if(document.getElementById('diatomicModal') != null){
+        mapDiv.appendChild(document.getElementById('diatomicModal'));
+    }
     
 
     
