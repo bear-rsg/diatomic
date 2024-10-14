@@ -345,6 +345,7 @@ const {MapboxOverlay} = deck;
     const mapDiv = document.getElementById('map');
     const menuDiv = document.getElementById('menu');
     mapDiv.appendChild(document.getElementById('control-panel'));
+    alert(menuDiv);
     mapDiv.appendChild(menuDiv);
     mapDiv.appendChild(document.getElementById('loader'));
     mapDiv.appendChild(document.getElementById('side-panel-btn'));
