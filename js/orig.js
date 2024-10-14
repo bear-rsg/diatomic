@@ -346,10 +346,10 @@
     mapDiv.appendChild(document.getElementById("control-panel"));
     //mapDiv.appendChild(document.getElementById("menu"));
     //mapDiv.appendChild(document.getElementById("loader"));
-    mapDiv.appendChild(document.getElementById("side-panel-btn"));
-    mapDiv.appendChild(document.getElementById("info-pane"));
-    mapDiv.appendChild(document.getElementById("info-pane-btn"));
-    mapDiv.appendChild(document.getElementById("diatomicModal"));
+    //mapDiv.appendChild(document.getElementById("side-panel-btn"));
+    //mapDiv.appendChild(document.getElementById("info-pane"));
+    //mapDiv.appendChild(document.getElementById("info-pane-btn"));
+    //mapDiv.appendChild(document.getElementById("diatomicModal"));
     const menuDiv = document.getElementById('menu');
 
     const layerList = document.getElementById('menu');
