@@ -343,17 +343,18 @@ const {MapboxOverlay} = deck;
     }
 
     const mapDiv = document.getElementById('map');
+    const menuDiv = document.getElementById('menu');
     mapDiv.appendChild(document.getElementById('control-panel'));
-    mapDiv.appendChild(document.getElementById('menu'));
+    mapDiv.appendChild(menuDiv);
     mapDiv.appendChild(document.getElementById('loader'));
     mapDiv.appendChild(document.getElementById('side-panel-btn'));
     mapDiv.appendChild(document.getElementById('info-pane'));
     mapDiv.appendChild(document.getElementById('info-pane-btn'));
     mapDiv.appendChild(document.getElementById('diatomicModal'));
-    const menuDiv = document.getElementById('menu');
+    
 
-    const layerList = document.getElementById('menu');
-    const inputs = layerList.getElementsByTagName('input');
+    
+    const inputs = menuDiv.getElementsByTagName('input');
 
     for (const input of inputs) {
         input.onclick = (layer) => {
