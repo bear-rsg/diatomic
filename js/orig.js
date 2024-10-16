@@ -489,7 +489,8 @@ const {MapboxOverlay} = deck;
                     },
                     'fill-extrusion-height': 15,
                     'fill-extrusion-opacity': 0.8,
-                }
+                },
+                'filter': ['>=', 'current-energy-efficiency', 0]
             });
         }
         map.on('idle', stopSpinner);
