@@ -781,22 +781,25 @@ const {MapboxOverlay} = deck;
 
             //$("#collapse3 > .panel-body").html();
             var hist_content = '';
+            var hist_title = '';
             var hist_opt = document.querySelector('input[name="chart_type"]:checked').value;
 
             if(hist_opt == 'eff'){
+                hist_title = 'Current Efficiency Histogram';
                 hist_content = document.getElementById('effChart');
             }
 
             if(hist_opt == 'pot'){
+                hist_title = 'Potential Efficiency Histogram';
                 hist_content = document.getElementById('potChart');
             }
-
+            
             // var clone = hist_content.cloneNode(true);
 
             var std_content = "My test content";
 
             if(type == 'histogram'){
-                $('.modal-title').text("My Histogram Modal");
+                $('.modal-title').text(hist_title);
                 $('.modal-body').html(hist_content);
 
             }else{
