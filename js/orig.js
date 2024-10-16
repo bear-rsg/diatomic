@@ -708,7 +708,7 @@ const {MapboxOverlay} = deck;
         });
 
         $('.open_panel').click(function(){
-            $('#control-panel').toggle('slow');
+            $('#control-panel').toggle();
         });
 
         $('.closebtn').click(function(){
