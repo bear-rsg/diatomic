@@ -1,9 +1,9 @@
-const {MapboxOverlay} = deck;
 
-    // Get a mapbox API access token
+    const {MapboxOverlay} = deck;
+
+    // CHANGEME!
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbHllbHc0c24wM2V4MnJzYjd6d3NhcDQ5In0.NqG44ctju4Fm25dTP8GqZQ';
-
-    // Initialize mapbox map
+    
     const map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/outdoors-v12',
         center: [-1.8802233550562848, 52.46858250430878],
@@ -15,13 +15,12 @@ const {MapboxOverlay} = deck;
 
     });
 
+    const loadExtras = true;
+
     map.addControl(
         new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            // Limit seach results to the UK.
+            accessToken: mapboxgl.accessToken,            
             countries: 'gb',
-            // Use a bounding box to further limit results
-            // to the geographic bounds representing East Birmingham
             bbox: [-1.9285,52.4604,-1.8557,52.4952],
             mapboxgl: mapboxgl
         }), 'top-left'
@@ -52,40 +51,12 @@ const {MapboxOverlay} = deck;
        return changed_vals;
     }
 
-    /* const months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-    ];
-
-    function filterBy(month) {
-        const filters = ['==', 'month', month];
-        //map.setFilter('epc-circles', filters);
-        //map.setFilter('epc-labels', filters);
-
-        // Set the label to the month
-        document.getElementById('month').textContent = months[month];
-    } */
-
     const draw = new MapboxDraw({
-        displayControlsDefault: false,
-        // boxSelect: true,
+        displayControlsDefault: false,        
         controls: {
             polygon: true,
             trash: true
         }
-        // Set mapbox-gl-draw to draw by default.
-        // The user does not have to click the polygon control button first.
-        // defaultMode: 'draw_polygon'
     });
 
     map.addControl(draw, 'top-left');
@@ -99,9 +70,7 @@ const {MapboxOverlay} = deck;
             positionOptions: {
                 enableHighAccuracy: true
             },
-            // When active the map will receive updates to the device's location as it changes.
             trackUserLocation: true,
-            // Draw an arrow next to the location dot to indicate which direction the device is heading.
             showUserHeading: true
         }), 'top-left'
     );
@@ -134,14 +103,11 @@ const {MapboxOverlay} = deck;
 
         var count = foundSrcFeat.length;
         var eff_count = 0;
-        //console.log('foundSrcFeat:' + JSON.stringify(foundSrcFeat));
 
         if(count > 0){
             console.log(count);
             for(var i=0;i<count;i++){
-                var histObj = foundSrcFeat[i]; // features
-                //console.log('histObj:' + JSON.stringify(histObj));
-                //console.log('histType: '+ histType);
+                var histObj = foundSrcFeat[i]; 
                 var histVal = '-1';
                 if(histType == 'current-energy-efficiency'){
                     histVal = histObj['properties']['current-energy-efficiency'];
@@ -151,7 +117,6 @@ const {MapboxOverlay} = deck;
                     histVal = histObj['properties']['potential-energy-efficiency'];
                     eff_count++;
                 }
-                //console.log('histVal: ' + histVal);
 
                 if(histVal >=0 && histVal <= 20) { sum_efficiency_g++; }
                 if(histVal >=21 && histVal <= 38) { sum_efficiency_f++; }
@@ -160,14 +125,6 @@ const {MapboxOverlay} = deck;
                 if(histVal >=69 && histVal <= 80) { sum_efficiency_c++; }
                 if(histVal >=81 && histVal <= 90) { sum_efficiency_b++; }
                 if(histVal >=91 ) { sum_efficiency_a++; }
-
-                //console.log('sum_efficiency_a: ' + sum_efficiency_a);
-                //console.log('sum_efficiency_b: ' + sum_efficiency_b);
-                //console.log('sum_efficiency_c: ' + sum_efficiency_c);
-                //console.log('sum_efficiency_d: ' + sum_efficiency_d);
-                //console.log('sum_efficiency_e: ' + sum_efficiency_e);
-                //console.log('sum_efficiency_f: ' + sum_efficiency_f);
-                //console.log('sum_efficiency_g: ' + sum_efficiency_g);
             }
 
             var perc_eff_a = (sum_efficiency_a/eff_count)*100;
@@ -208,12 +165,11 @@ const {MapboxOverlay} = deck;
                 data: fc
             });
         }
-
-        // Add a new layer to visualize the polygon.
+        
         map.addLayer({
             'id': 'found-layer',
             'type': 'fill-extrusion',
-            'source': 'found', // reference the data source
+            'source': 'found', 
             'paint': {
                 'fill-extrusion-color': '#053ef7',
                 'fill-extrusion-height': 20,
@@ -221,7 +177,6 @@ const {MapboxOverlay} = deck;
             }
         });
 
-        //alert("added found features layer");
     }
 
 
@@ -242,8 +197,7 @@ const {MapboxOverlay} = deck;
         return inside;
     }
 
-    function updateArea(e) {
-        // alert("updating info for lasso");
+    function updateArea(e) {        
         var foundFeaturePolygons = [];
 
         const data = draw.getAll();
@@ -262,16 +216,12 @@ const {MapboxOverlay} = deck;
         const epcSourceFeatures = map.querySourceFeatures('epc', {
              'sourceLayer': 'epc-layer'
         });
-        // console.log("epc source data found: " + JSON.stringify(epcSourceFeatures));
-
+        
         var featureSet = epcRenderedFeatures;
 
-        if (!featureSet.length) { // this is the number of features loaded on the screen and affected by zoom
+        if (!featureSet.length) { 
             console.log("no epc data found");
             return;
-        }else{
-            console.log("epcRenderedFeatures length: "+featureSet.length);
-            // console.log("epc data found: " + JSON.stringify(featureSet[0]['geometry']['coordinates']));
         }
 
         var foundFeatures = 0;
@@ -283,8 +233,7 @@ const {MapboxOverlay} = deck;
 
             var epcObj = featureSet[i];
 
-            if( epcObj['properties']['current-energy-efficiency'] != null ){
-                //var lasso_polygon = searchWithin;
+            if( epcObj['properties']['current-energy-efficiency'] != null ){                
                 if(epcObj['geometry']['type']=='MultiPolygon'){
                     var point_data = epcObj['geometry']['coordinates'][0][0][0];
                 }else{
@@ -325,8 +274,7 @@ const {MapboxOverlay} = deck;
         var averageEfficiency = round(totalEPC / foundFeatures);
         var potentialEfficiency = round(totalPotentialEPC / foundFeatures);
         var fpolygonsArr = JSON.stringify(foundFeaturePolygons);
-        //var strungFpolygonsArr = JSON.stringify(fpolygonsArr);
-        //console.log("fpolygonsArr: " + strungFpolygonsArr.substring(1,strungFpolygonsArr.length-1));
+                
         if(foundFeatures > 0){
             document.getElementById('avg-eff').innerHTML = averageEfficiency;
             document.getElementById('avg-eff').setAttribute('data-color', averageEfficiency);
@@ -334,15 +282,13 @@ const {MapboxOverlay} = deck;
             document.getElementById('avg-pot-eff').setAttribute('data-color', potentialEfficiency);
 
         }
-        // foundLassoFeatures(foundFeaturePolygons);
+
         foundLassoFeatures(foundFeaturePolygons);
-        //alert("polygonData: "+polygonData+"\n\nfoundFeatureUprns: \n\n" + foundFeatureUprns + "");
-        console.log("Found Feature Uprns: \n\n" + foundFeatureUprns + "");
         setChanged(1);
 
     }
 
-        const mapDiv = document.getElementById('map');
+    const mapDiv = document.getElementById('map');
     const menuDiv = document.getElementById('menu');
 
     mapDiv.appendChild(document.getElementById('control-panel'));
@@ -364,9 +310,7 @@ const {MapboxOverlay} = deck;
     if(document.getElementById('diatomicModal') != null){
         mapDiv.appendChild(document.getElementById('diatomicModal'));
     }
-    
 
-    
     const inputs = menuDiv.getElementsByTagName('input');
 
     for (const input of inputs) {
@@ -376,20 +320,13 @@ const {MapboxOverlay} = deck;
         };
     }
 
-    // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-    // Add fullscreen option
     map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
-    //const epcSrcFeatures = map.querySourceFeatures('epc', {filter: ["==", "72", e.features[0].properties.current-energy-efficiency]});
-    //console.log("epc source data found: " + JSON.stringify(epcSrcFeatures));
-
-    // Change the cursor to a pointer when the mouse is over the places layer.
     map.on('mouseenter', 'epc-layer', () => {
         map.getCanvas().style.cursor = 'pointer';
     });
 
-    // Change it back to a pointer when it leaves.
     map.on('mouseleave', 'epc-layer', () => {
         map.getCanvas().style.cursor = '';
     });
@@ -402,7 +339,6 @@ const {MapboxOverlay} = deck;
         const features = e.features[0];
         console.log("features(all): "+ JSON.stringify(features));
 
-        // Copy coordinates array
         const coordinates = features.geometry.coordinates;
         console.log("coordinates: "+ coordinates);
 
@@ -427,17 +363,14 @@ const {MapboxOverlay} = deck;
             var coord_feature = coordinates;
             msg4_all = '' + coord_feature;
             msg4_arr = msg4_all.split(',');
-            //for(var i = 0; i < 2; i++) {
-             //  msg4_arr[i] = msg4_arr[i].replace(/^\s*/, "").replace(/\s*$/, "");
                msg4 = "\n";
                msg4 += msg4_arr[0]+"\n";
                msg4 += msg4_arr[1]+"\n";
-            //}
         }else{
             msg4 = '-';
 
         }
-        // console.log(msg);
+        
         const currentEfficiency = features['properties']['current-energy-efficiency'];
         const potentialEfficiency = features['properties']['potential-energy-efficiency'];
 
@@ -464,7 +397,7 @@ const {MapboxOverlay} = deck;
     stopSpinner = (e) => {
         console.log('stop spinner');
         document.getElementById("loader").style.visibility = "hidden";
-        map.off('idle', stopSpinner);
+        map.off('idle', stopSpinner);       
         setChanged(1);
     }
 
@@ -472,17 +405,15 @@ const {MapboxOverlay} = deck;
         document.getElementById("loader").style.visibility = "visible";
         if(!map.getSource('epc')){
             map.addSource('epc', {
-                type: 'geojson',
-                // Use a URL for the value for the `data` property.
-                data: 'https://bear-rsg.github.io/diatomic/js/wmca_epc_data.geojson'
+                type: 'geojson',                
+                data: 'https://bear-rsg.github.io/diatomic/js/data/wmca_epc_data.geojson'
             });
 
             map.addLayer({
                 'id': 'epc-layer',
                 'source': 'epc',
                 'type': 'fill-extrusion',
-                'paint': {
-                    //'fill-extrusion-color': '#52be80',
+                'paint': {                    
                     'fill-extrusion-color': {
                         property: 'current-energy-efficiency',
                         stops: [[0, '#d4340d'], [21, '#f18421'], [38, '#f8b368'], [55, '#f0c713'], [69, '#8cc637'], [81, '#1bb359'], [92, '#02895d']]
@@ -493,19 +424,116 @@ const {MapboxOverlay} = deck;
                 'filter': ['>=', 'current-energy-efficiency', 0]
             });
         }
+
+        if(loadExtras){
+            if(!map.getSource('wards')){
+                map.addSource('wards', {
+                    type: 'geojson',
+                    data: 'https://bear-rsg.github.io/diatomic/js/data/CLP-wards_4326.geojson'
+                });
+                map.addLayer({
+                    'id': 'wardBoundaries',
+                    'type': 'line',
+                    'source': 'wards', 
+                    'layout': {
+                        'visibility': 'none',
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    'minzoom': 10,
+                    'maxzoom': 15,
+                    'paint': {
+                        'line-color': '#385dce',                         
+                        'line-width': {
+                            'type': 'exponential',
+                            'stops': [
+                                [11, 2],
+                                [15, 3],
+                            ]
+                        },
+                    }
+                });
+            }
+            if(!map.getSource('lsoas')){
+                map.addSource('lsoas', {
+                    type: 'geojson',
+                    data: 'https://bear-rsg.github.io/diatomic/js/data/EBNS_LSOA_epc_4326.geojson'
+                });
+                map.addLayer({
+                    "id": "lsoaChoropleth",
+                    "type": "fill",
+                    "source": "lsoas",
+                    'layout': {                        
+                        'visibility': 'none'
+                    },
+                    "paint": {
+                        'fill-color': [
+                            'step',
+                            ['get', '1A_1B_1C_1D'],
+                            '#660000', 1,
+                            '#cc0000', 2,
+                            '#f44336', 3,
+                            '#e06666', 4,
+                            '#f4cccc', 5,
+                            '#d0e0e3', 6,
+                            '#9fc5e8', 7,
+                            '#2986cc', 8,
+                            '#0b5394', 9,
+                            '#073763'
+                        ],
+                        'fill-outline-color': 'rgba(0, 0, 0, 0.2)',
+                        'fill-opacity': 0.5
+                    },
+                });
+            }
+            
+            if(!map.getSource('chargepoints')){
+                map.addSource('chargepoints', {
+                    type: 'geojson',
+                    'data': 'https://bear-rsg.github.io/diatomic/js/data/NCR_Bham_Cov_4326.geojson'
+                });
+                map.addLayer({
+                    'id': 'chPoints',
+                    'type': 'circle',
+                    'source': 'chargepoints',
+                    'minzoom': 10,
+                    'layout': {
+                        // Make the layer non-visible by default.
+                        'visibility': 'none'
+                    },
+                    'paint': {                        
+                        'circle-radius': {
+                            'type': 'exponential',
+                            'stops': [
+                                [10, 3],
+                                [16, 8],
+                                [22, 15],
+                            ]
+                        },
+                        "circle-color": "#913bfb",
+                        'circle-stroke-color': '#ffffff', 
+                        'circle-stroke-width': {
+                            'type': 'exponential',
+                            'stops': [
+                                [11, 2],
+                                [18, 6],
+                            ]
+                        },
+                        'circle-opacity': 0.8,
+                    }
+                });
+            }
+        }
+
         map.on('idle', stopSpinner);
     });
 
-    map.on('style.load', () => {
-        // Insert the layer beneath any symbol layer.
+    map.on('style.load', () => {        
         const layers = map.getStyle().layers;
         const labelLayerId = layers.find(
             (layer) => layer.type === 'symbol' && layer.layout['text-field']
         ).id;
 
-        // The 'building' layer in the Mapbox Streets
-        // vector tileset contains building height data
-        // from OpenStreetMap.
         map.addLayer(
             {
                 'id': 'add-3d-buildings',
@@ -516,10 +544,7 @@ const {MapboxOverlay} = deck;
                 'minzoom': 15,
                 'paint': {
                     'fill-extrusion-color': '#e8f3f7',
-
-                    // Use an 'interpolate' expression to
-                    // add a smooth transition effect to
-                    // the buildings as the user zooms in.
+                    
                     'fill-extrusion-height': [
                         'interpolate',
                         ['linear'],
@@ -579,7 +604,6 @@ const {MapboxOverlay} = deck;
                 if(hist_eff_data[i].x >=92 && hist_eff_data[i].x <= 100) { currBgroundColour.push('hsl(214,45%,49%)') }
                 currLabelValues.push(hist_eff_data[i].x);
             }
-            //console.log('currLabelValues: '+currLabelValues);
 
             const potBgroundColour = [];
             const potLabelValues = [];
@@ -594,13 +618,10 @@ const {MapboxOverlay} = deck;
                 if(hist_pot_data[i].x >=92 && hist_pot_data[i].x <= 100) { potBgroundColour.push('hsl(214,45%,49%)') }
                 potLabelValues.push(hist_pot_data[i].x);
             }
-            //console.log('potLabelValues: '+potLabelValues);
 
             var eff_ctx = document.getElementById('effChart').getContext('2d');
-            var chart1 = new Chart(eff_ctx, {
-                // The type of chart we want to create
-                type: 'bar',
-                // The data for our dataset
+            var chart1 = new Chart(eff_ctx, {                
+                type: 'bar',                
                 data: {
                     labels: ['G', 'F', 'E', 'D', 'C', 'B', 'A' ],
                     datasets: [{
@@ -613,8 +634,7 @@ const {MapboxOverlay} = deck;
 
                     }]
                 },
-
-                // Configuration options go here
+                
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -629,7 +649,7 @@ const {MapboxOverlay} = deck;
                             type: 'linear',
                             title: {
                                 display: true,
-                                text: '%'
+                                text: 'percentage'
                             }
                         }
                     }
@@ -638,9 +658,7 @@ const {MapboxOverlay} = deck;
 
             var pot_ctx = document.getElementById('potChart').getContext('2d');
             var chart2 = new Chart(pot_ctx, {
-                // The type of chart we want to create
                 type: 'bar',
-                // The data for our dataset
                 data: {
                     labels: ['G', 'F', 'E', 'D', 'C', 'B', 'A' ],
                     datasets: [{
@@ -653,8 +671,7 @@ const {MapboxOverlay} = deck;
 
                     }]
                 },
-
-                // Configuration options go here
+                
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -678,6 +695,14 @@ const {MapboxOverlay} = deck;
 
             setChanged(0);
         }
+
+        /* switchlayer = function (lname) {
+            if (document.getElementById(lname + "_toggle").parent().attr('aria-checked')) {
+                map.setLayoutProperty(lname, 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty(lname, 'visibility', 'none');
+            }
+        } */
     });
 
     $(document).ready(function(){
@@ -764,8 +789,6 @@ const {MapboxOverlay} = deck;
                 first = parseInt(name.split('-')[0],10);
                 second = parseInt(name.split('-')[1],10);
 
-                //console.log(between(dc, first, second));
-
                 if(between(dc, first, second) ){
                     th.attr('class', value);
                 }
@@ -778,9 +801,8 @@ const {MapboxOverlay} = deck;
             var button = $(e.relatedTarget);
             var type = button.attr('data-type');
 
-             var myModal = $(this);
+            var myModal = $(this);
 
-            //$("#collapse3 > .panel-body").html();
             var hist_content = '';
             var hist_title = '';
             var hist_opt = document.querySelector('input[name="chart_type"]:checked').value;
@@ -794,8 +816,6 @@ const {MapboxOverlay} = deck;
                 hist_title = 'Potential Efficiency Histogram';
                 hist_content = document.getElementById('potChart');
             }
-            
-            // var clone = hist_content.cloneNode(true);
 
             var std_content = "My test content";
 
@@ -821,4 +841,90 @@ const {MapboxOverlay} = deck;
             }
             $(hist_content).insertAfter("#hist_options");
         });
+
+        var checkbox_link = document.querySelector('#lsoaListtogglediv');
+        var checkbox_link2 = document.querySelector('#wardBoundariestogglediv');
+        var checkbox_link3 = document.querySelector('#chPointstogglediv');
+
+        var checkbox_layer = '';
+
+        checkbox_link.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if($(this).attr('id') == 'lsoaListtogglediv'){
+                checkbox_layer = 'lsoaChoropleth';
+            }
+            var clickedLayer = checkbox_layer;
+
+            var is_active = $(this).find('.ui-switcher').attr('aria-checked');
+            var toggle_on = false;
+            if(is_active == 'true'){
+                toggle_on = true;
+            }
+
+            const visibility = map.getLayoutProperty(
+                                clickedLayer,
+                                'visibility'
+                            );
+
+            if(toggle_on) {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            }
+        };
+
+        checkbox_link2.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if($(this).attr('id') == 'wardBoundariestogglediv'){
+                checkbox_layer = 'wardBoundaries';
+            }
+
+            var clickedLayer = checkbox_layer;
+
+            var is_active = $(this).find('.ui-switcher').attr('aria-checked');
+            var toggle_on = false;
+            if(is_active == 'true'){
+                toggle_on = true;
+            }
+
+            if(toggle_on) {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            }
+        };
+
+        checkbox_link3.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if($(this).attr('id') == 'chPointstogglediv'){
+                checkbox_layer = 'chPoints';
+            }
+
+            var clickedLayer = checkbox_layer;
+
+            var is_active = $(this).find('.ui-switcher').attr('aria-checked');
+            var toggle_on = false;
+            if(is_active == 'true'){
+                toggle_on = true;
+            }
+            
+            if(toggle_on) {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            }
+        };
+        var epcA_range = ["", "BK", "MN"];
+        var epcCurrFilter=[
+            "all",
+            ['>=', 'properties.current-energy-efficiency', '0']
+        ]
+        map.setFilter('epc-layer',epcCurrFilter)
+
     });
