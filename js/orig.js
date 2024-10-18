@@ -252,7 +252,7 @@
                     console.log("Already found: " + JSON.stringify(splitFoundUprns));
                     var currUprn = featObj['properties'].UPRN;
                     console.log("Already found " + currUprn + ": "+ splitFoundUprns.includes(currUprn));
-                    if(!splitFoundUprns.includes(currUprn)){
+                    if(!splitFoundUprns.includes("" + currUprn + "")){
                         foundFeatures++;
                         foundFeaturePolygons.push(featObj);
                         foundFeatureUprns += currUprn + "\n";
