@@ -55,11 +55,45 @@
 }
 
 .ui-switcher[aria-checked=true] {
-    background-color: #39bfac;
+    background-color: #3471bf;
 }
-#inlineCheckbox1div .ui-switcher[aria-checked=true] {
-    background-color: #6f39bf;
+
+#lsoaListtogglediv .ui-switcher[aria-checked=true] {
+    background-color: #07a2ff;
 }
-#inlineCheckbox3div .ui-switcher[aria-checked=true] {
-    background-color: #39bf4e;
+
+#chPointstogglediv .ui-switcher[aria-checked=true] {
+    background-color: #9542fb;
+}
+
+#epcTypeAtogglediv .ui-switcher[aria-checked=true] {
+    background-color: #02895d;
+}
+
+#epcTypeBtogglediv .ui-switcher[aria-checked=true] {
+    background-color: #1bb359;
+}
+
+#epcTypeCtogglediv .ui-switcher[aria-checked=true] {
+    background-color: #8cc637;
+}
+
+#epcTypeDtogglediv .ui-switcher[aria-checked=true] {
+    background-color: #f0c713;
+}
+
+#epcTypeEtogglediv .ui-switcher[aria-checked=true] {
+    background-color: #f8b368;
+}
+
+#epcTypeFtogglediv .ui-switcher[aria-checked=true] {
+    background-color: #f18421;
+}
+
+#epcTypeGtogglediv .ui-switcher[aria-checked=true] {
+    background-color: #d4340d;
+}
+
+#epcTypeNonetogglediv .ui-switcher[aria-checked=true] {
+    background-color: #000;
 }
