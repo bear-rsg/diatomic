@@ -9,7 +9,6 @@
     <link href='https://api.mapbox.com/mapbox-assembly/v1.3.0/assembly.min.css' rel='stylesheet'>
     <script async defer src='https://api.mapbox.com/mapbox-assembly/v1.3.0/assembly.js'></script>
     <script src="https://unpkg.com/deck.gl@^6.2.0/deckgl.min.js"></script>
-    <!-- script-- src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script -->
     <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" type="text/css">
@@ -115,35 +114,12 @@
         }
     </style>
 </head>
-<!-- Modal -->
-<div class="modal fade" id="diatomicModal" tabindex="-1" role="dialog" aria-labelledby="diatomicModal" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="diatomicModalLabel">Modal Title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="diatomicModalBody">
-                ...
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="modal-close">Close</button>
-                <button type="button" class="btn btn-primary">Save</button>
-            </div>
-        </div>
-    </div>
-</div>
     <body>
         <button id="side-panel-btn" class="open_panel">☰</button>
     <div id="map"></div>
-    <!--  insert this after load into position at top-left block -->
     <div id="basemap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Change basemap"><img alt="Change basemap" class="basemap" style="padding:3px;margin-left: 2px;" src="./images/basemap.svg" width="25" height="25"></button></div>
     <div id="menu">
         <input id="satellite-streets-v12" type="radio" name="rtoggle" value="satellite" checked="checked">
-        <!-- See a list of Mapbox-hosted public styles at -->
-        <!-- https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
         <label for="satellite-streets-v12">satellite streets</label>
         <input id="light-v11" type="radio" name="rtoggle" value="light">
         <label for="light-v11">light</label>
@@ -196,10 +172,6 @@
                 </div>
                 <div id="collapse3" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <button type="button" class="btn btn-primary btn-xs float-right" data-toggle="modal"
-                                data-target="#diatomicModal" data-type="histogram">
-                            show in modal
-                        </button>
                         <div id="hist_options"  class="btn-group" role="group" aria-label="Chart Type">
                             <input type="radio" id="curr" name="chart_type" value="eff" class="form-check-input" checked="checked">
                             <label for="curr">Current</label>
@@ -219,36 +191,63 @@
                 </div>
                 <div id="collapse4" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <!-- buttons / checkboxes / sliders -->
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#diatomicModal">
-                            Launch demo modal
-                        </button>
-                        <hr/>
-                        <h5>Slider</h5>
-                        <label id="month"></label>
-                        <input id="slider" type="range" min="0" max="11" step="1" value="0">
-                        <hr/>
-                        <h5>Toggle options</h5>
-                        <div class="form-check form-check-inline" id="inlineCheckbox1div">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                            <label for="inlineCheckbox1">Option1</label>
-                        </div>
-                        <div class="form-check form-check-inline" id="inlineCheckbox2div">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-                            <label for="inlineCheckbox2">Option2</label>
-                        </div>
-                        <div class="form-check form-check-inline" id="inlineCheckbox3div">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-                            <label for="inlineCheckbox3">Option3</label>
-                        </div>
-                        <nav id="filter-group" class="filter-group"></nav>
+                        <h5>Layer options</h5>
+                        <nav id="filter-group-layers" class="">
+                            <div class="form-check form-check-inline toggletrigger" id="lsoaListtogglediv">
+                                <input class="form-check-input" type="checkbox" id="lsoaList_toggle" value="lsoalist">
+                                <label for="lsoaList_toggle">LSOA list</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger"  id="wardBoundariestogglediv">
+                                <input class="form-check-input" type="checkbox" id="wardBoundaries_toggle" value="wardBoundaries">
+                                <label for="wardBoundaries_toggle">Ward Boundaries</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger" id="chPointstogglediv">
+                                <input class="form-check-input" type="checkbox" id="chPoints_toggle" value="chPoints">
+                                <label for="chPoints_toggle">Charge Points</label>
+                            </div>
+                        </nav>
+                        <hr>
+                        <h5>EPC Rating options</h5>
+                        <nav id="filter-group-epc-type" class="">
+                            <div class="form-check form-check-inline toggletrigger" id="epcTypeAtogglediv">
+                                <input class="form-check-input" type="checkbox" id="epcTypeA_toggle" value="epcTypeA" checked="checked">
+                                <label for="epcTypeA_toggle">A</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger" id="epcTypeBtogglediv">
+                                <input class="form-check-input" type="checkbox" id="epcTypeB_toggle" value="epcTypeB" checked="checked">
+                                <label for="epcTypeB_toggle">B</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger" id="epcTypeCtogglediv">
+                                <input class="form-check-input" type="checkbox" id="epcTypeC_toggle" value="epcTypeC" checked="checked">
+                                <label for="epcTypeC_toggle">C</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger" id="epcTypeDtogglediv">
+                                <input class="form-check-input" type="checkbox" id="epcTypeD_toggle" value="epcTypeD" checked="checked">
+                                <label for="epcTypeD_toggle">D</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger" id="epcTypeEtogglediv">
+                                <input class="form-check-input" type="checkbox" id="epcTypeE_toggle" value="epcTypeE" checked="checked">
+                                <label for="epcTypeE_toggle">E</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger" id="epcTypeFtogglediv">
+                                <input class="form-check-input" type="checkbox" id="epcTypeF_toggle" value="epcTypeF" checked="checked">
+                                <label for="epcTypeF_toggle">F</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger" id="epcTypeGtogglediv">
+                                <input class="form-check-input" type="checkbox" id="epcTypeG_toggle" value="epcTypeG" checked="checked">
+                                <label for="epcTypeF_toggle">G</label>
+                            </div>
+                            <div class="form-check form-check-inline toggletrigger" id="epcTypeNonetogglediv">
+                                <input class="form-check-input" type="checkbox" id="epcTypeNone_toggle" value="epcTypeNone">
+                                <label for="epcTypeNone_toggle">None</label>
+                            </div>
+                        </nav>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div id="loader"></div>
-    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <div id="loader"></div>    
     <script type="text/javascript" src="./js/jquery.switcher.min.js"></script>
     <script>
         jQuery(function($) {
