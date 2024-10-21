@@ -586,7 +586,7 @@
                 $('h4.panel-title > a[href="#collapse3"]').text("Lasso values");
                 foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['found-layer']}), "UPRN");
             }else{
-                $('h4.panel-title > a[href="#collapse3"]').text("Overview (all values)");
+                $('h4.panel-title > a[href="#collapse3"]').text("Overview (current view)");
                 foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['epc-layer']}), "UPRN");
             }
 
@@ -935,6 +935,6 @@
             "all",
             ['>=', 'properties.current-energy-efficiency', '0']
         ]
-        map.setFilter('epc-layer',epcCurrFilter)
+        //map.setFilter('epc-layer',epcCurrFilter)
 
     });
