@@ -29,8 +29,7 @@
 
     var changed_vals = true;
 
-    function flatView() {
-        console.log("going to flat view");
+    function flatView() {        
         map.jumpTo({
             pitch: 0,
             bearing: 0
@@ -44,7 +43,6 @@
         }else{
             changed_vals = false;
         }
-        console.log('changing changed_vals to ' + opt);
     }
 
     function getChanged(){
@@ -78,9 +76,7 @@
     function clearFoundFeatures() {
         if(map.getLayer('found-layer')){
             map.removeLayer('found-layer');
-            console.log('found-layer has been removed');
             map.removeSource('found');
-            console.log('found source has been removed');
         }
     }
 
@@ -101,11 +97,11 @@
         var perc_efficiency_e = 0;
         var perc_efficiency_g = 0;
 
+        var foundSrcFeat = removeDuplicates(foundSrcFeat, "UPRN");
         var count = foundSrcFeat.length;
         var eff_count = 0;
 
         if(count > 0){
-            console.log(count);
             for(var i=0;i<count;i++){
                 var histObj = foundSrcFeat[i]; 
                 var histVal = '-1';
@@ -148,10 +144,8 @@
     }
 
     function foundLassoFeatures(fpolygonsArr){
-        var foundArr = fpolygonsArr;
-        console.log('fpolygonsArr passed to foundLassoFeatures: '+ foundArr);
+        var foundArr = fpolygonsArr;        
         var fc = turf.featureCollection(foundArr);
-        console.log('fc: '+ JSON.stringify(fc));
         clearFoundFeatures();
 
         if(map.getSource('found')){
@@ -197,27 +191,37 @@
         return inside;
     }
 
-    function updateArea(e) {        
+    function removeDuplicates(features, comparatorProperty) {
+        const uniqueIds = new Set();
+        const uniqueFeatures = [];
+        for (const feature of features) {
+            const id = feature.properties[comparatorProperty];
+            if (!uniqueIds.has(id)) {
+                uniqueIds.add(id);
+                uniqueFeatures.push(feature);
+            }
+        }
+        return uniqueFeatures;
+    }
+
+    function updateArea(e) {
         var foundFeaturePolygons = [];
 
         const data = draw.getAll();
-        const polygonData = data.features[0].geometry.coordinates[0];
-        console.log("Boundary polygon points:" + JSON.stringify(polygonData));
+        const polygonData = data.features[0].geometry.coordinates[0];        
 
         const searchWithin = turf.polygon([polygonData]);
-        console.log("searchWithin: "+ searchWithin);
         const answer = document.getElementById('calculated-area');
 
         const epcRenderedFeatures = map.queryRenderedFeatures({
             layers: ['epc-layer']
-        });
-        console.log("epc rendered data found: " + JSON.stringify(epcRenderedFeatures));
+        });        
 
         const epcSourceFeatures = map.querySourceFeatures('epc', {
              'sourceLayer': 'epc-layer'
         });
         
-        var featureSet = epcRenderedFeatures;
+        var featureSet = removeDuplicates(epcRenderedFeatures, "UPRN");
 
         if (!featureSet.length) { 
             console.log("no epc data found");
@@ -238,33 +242,21 @@
                     var point_data = epcObj['geometry']['coordinates'][0][0][0];
                 }else{
                     var point_data = epcObj['geometry']['coordinates'][0][0];
-                }
-                console.log("point_data:" + point_data);
+                }                
 
-                var pntInPolygon = isPointInPolygon(point_data, polygonData);
-                console.log("pntInPolygon (" + point_data + "): "+ pntInPolygon);
-                console.log("epcObj['geometry']['coordinates'][0]:" + epcObj['geometry']['coordinates'][0]);
+                var pntInPolygon = isPointInPolygon(point_data, polygonData);                
 
                 var featureType = epcObj['geometry']['type'];
                 var featObj = epcObj;
+                
                 if(pntInPolygon) {
-                    var splitFoundUprns = foundFeatureUprns.split('\n');
-                    console.log("Already found: " + JSON.stringify(splitFoundUprns));
                     var currUprn = featObj['properties'].UPRN;
-                    console.log("Already found " + currUprn + ": "+ splitFoundUprns.includes(currUprn));
-                    if(!splitFoundUprns.includes("" + currUprn + "")){
-                        foundFeatures++;
-                        foundFeaturePolygons.push(featObj);
-                        foundFeatureUprns += currUprn + "\n";
-                        totalEPC += parseInt(featObj['properties']['current-energy-efficiency']);
-                        totalPotentialEPC += parseInt(featObj['properties']['potential-energy-efficiency']);
-                        console.log("Feature UPRN: "+ featObj['properties'].UPRN + " ("+featureType+") is inside boundary");
-                    }else{
-                        console.log(currUprn + " already in found array");
-                    }
-                }else {
-                    console.log("Feature UPRN: "+ featObj['properties'].UPRN + " ("+featureType+") not inside boundary");
-                }
+                    foundFeatures++;
+                    foundFeaturePolygons.push(featObj);
+                    foundFeatureUprns += currUprn + "\n";
+                    totalEPC += parseInt(featObj['properties']['current-energy-efficiency']);
+                    totalPotentialEPC += parseInt(featObj['properties']['potential-energy-efficiency']);                    
+                }                
 
             }
 
@@ -336,12 +328,9 @@
         $('#control-panel').show();
         $('#collapse1').collapse('show');
 
-        const features = e.features[0];
-        console.log("features(all): "+ JSON.stringify(features));
+        const features = e.features[0];        
 
         const coordinates = features.geometry.coordinates;
-        console.log("coordinates: "+ coordinates);
-
         if(features['properties']['current-energy-efficiency']) {
             msg = '' + features['properties']['current-energy-efficiency'];
         }else{
@@ -394,8 +383,7 @@
         map.on('idle', stopSpinner);
     }
 
-    stopSpinner = (e) => {
-        console.log('stop spinner');
+    stopSpinner = (e) => {        
         document.getElementById("loader").style.visibility = "hidden";
         map.off('idle', stopSpinner);       
         setChanged(1);
@@ -416,7 +404,7 @@
                 'paint': {                    
                     'fill-extrusion-color': {
                         property: 'current-energy-efficiency',
-                        stops: [[0, '#d4340d'], [21, '#f18421'], [38, '#f8b368'], [55, '#f0c713'], [69, '#8cc637'], [81, '#1bb359'], [92, '#02895d']]
+                        stops: [[0, '#d4340d'], [21, '#f18421'], [39, '#f8b368'], [55, '#f0c713'], [69, '#8cc637'], [81, '#1bb359'], [92, '#02895d']]
                     },
                     'fill-extrusion-height': 15,
                     'fill-extrusion-opacity': 0.8,
@@ -574,6 +562,20 @@
         startSpinner();
     };
 
+    function resetCanvas(canvasId){
+        var removeID = "#"+canvasId;
+        $(removeID).remove();
+        $("<canvas id='" + canvasId + "'><canvas>").insertAfter( "#hist_options" );
+        selected_value = $("input[name='chart_type']:checked").val();
+        if(selected_value == 'eff'){
+            $('#effChart').removeClass('hidden');
+            $('#potChart').addClass('hidden');
+        }else{
+            $('#potChart').removeClass('hidden');
+            $('#effChart').addClass('hidden');
+        }
+    };
+
     map.on('idle', (e) => {
 
         if(getChanged()){
@@ -619,6 +621,7 @@
                 potLabelValues.push(hist_pot_data[i].x);
             }
 
+            resetCanvas('effChart');
             var eff_ctx = document.getElementById('effChart').getContext('2d');
             var chart1 = new Chart(eff_ctx, {                
                 type: 'bar',                
@@ -656,6 +659,7 @@
                 }
             });
 
+            resetCanvas('potChart');
             var pot_ctx = document.getElementById('potChart').getContext('2d');
             var chart2 = new Chart(pot_ctx, {
                 type: 'bar',
@@ -734,6 +738,7 @@
 
         $('.open_panel').click(function(){
             $('#control-panel').toggle();
+            $('#potChart').addClass('hidden');
         });
 
         $('.closebtn').click(function(){
