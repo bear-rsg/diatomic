@@ -586,7 +586,7 @@
                 $('h4.panel-title > a[href="#collapse3"]').text("Lasso values");
                 foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['found-layer']}), "UPRN");
             }else{
-                $('h4.panel-title > a[href="#collapse3"]').text("Overview (current view)");
+                $('h4.panel-title > a[href="#collapse3"]').text("Overview");
                 foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['epc-layer']}), "UPRN");
             }
 
