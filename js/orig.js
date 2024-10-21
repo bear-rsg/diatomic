@@ -582,16 +582,21 @@
 
             var foundSourceFeatures = [];
             if(map.getLayer('found-layer')){
-                foundSourceFeatures = map.queryRenderedFeatures({layers: ['found-layer']});
                 $('#collapse3').collapse('show');
                 $('h4.panel-title > a[href="#collapse3"]').text("Lasso values");
+                foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['found-layer']}), "UPRN");
             }else{
-                foundSourceFeatures = map.queryRenderedFeatures({layers: ['epc-layer']});
                 $('h4.panel-title > a[href="#collapse3"]').text("Overview (all values)");
+                foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['epc-layer']}), "UPRN");
             }
 
-            const hist_eff_data = buildHistogramData(foundSourceFeatures, 'current-energy-efficiency');
-            const hist_pot_data = buildHistogramData(foundSourceFeatures, 'potential-energy-efficiency');
+            foundSourceFeaturesCnt = foundSourceFeatures.length;
+            var hist_eff_data = [];
+            var hist_pot_data = [];
+            if (foundSourceFeaturesCnt > 0){
+                hist_eff_data = buildHistogramData(foundSourceFeatures, 'current-energy-efficiency');
+                hist_pot_data = buildHistogramData(foundSourceFeatures, 'potential-energy-efficiency');
+            }
 
             const currBgroundColour = [];
             const currLabelValues = [];
