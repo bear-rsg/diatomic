@@ -16,6 +16,57 @@
     });
 
     const loadExtras = true;
+const lightPresets = {
+        sunrise: {
+              "id": "sunrise_light",
+              "type": "directional",
+              "properties": {
+                  "color": "rgba(255.0, 0.0, 0.0, 0.4)",
+                  "intensity": 0.43,
+                  "direction": [200.0, 40.0],
+                  "cast-shadows": true,
+                  "shadow-intensity": 0.8
+              }
+        },
+        noon: {
+            "id": "noon_light",
+            "type": "directional",
+            "properties": {
+                "color": "hsl(35, 100%, 100%)",
+                "intensity": 0.6,
+                "direction": [90.0, 40.0],
+                "cast-shadows": true,
+                "shadow-intensity": 0.1
+            }
+        },
+        sunset: {
+            "id": "sunset_light",
+            "type": "directional",
+            "properties": {
+                "color": "hsl(20, 80%, 60%)",
+                "intensity": 1.0,
+                "direction": [1.5, 40.0],
+                "cast-shadows": true,
+                "shadow-intensity": 0.8
+            }
+        },
+        night: {
+            "id": "night_light",
+            "type": "directional",
+            "properties": {
+                "color": "hsl(200, 50%, 40%)",
+                "intensity": 1.0,
+                "direction": [270, 40.0],
+                "cast-shadows": true,
+                "shadow-intensity": 0.2
+            }
+       }
+    };
+
+    function changeLightPreset(preset) {
+        var lightSettings = lightPresets[preset];
+        map.setLights([lightSettings]);
+    }
 
     map.addControl(
         new MapboxGeocoder({
@@ -930,11 +981,13 @@
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
             }
         };
-        var epcA_range = ["", "BK", "MN"];
-        var epcCurrFilter=[
-            "all",
-            ['>=', 'properties.current-energy-efficiency', '0']
-        ]
-        //map.setFilter('epc-layer',epcCurrFilter)
+        
+        const lightOpts = lightLevelDiv.getElementsByTagName('img');
+        for (const opt of lightOpts) {
+            opt.onclick = (lightObj) => {
+                const lightName =  lightObj.target.name;
+                changeLightPreset(lightName);
+            };
+        }
 
     });
