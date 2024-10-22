@@ -4,8 +4,8 @@
     // CHANGEME!
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbHllbHc0c24wM2V4MnJzYjd6d3NhcDQ5In0.NqG44ctju4Fm25dTP8GqZQ';
     
-    const map = new mapboxgl.Map({
-        style: 'mapbox://styles/mapbox/outdoors-v12',
+    var map = new mapboxgl.Map({
+        style: 'mapbox://styles/mapbox/standard',
         center: [-1.8802233550562848, 52.46858250430878],
         zoom: 16,
         pitch: 75,
