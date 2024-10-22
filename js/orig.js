@@ -7,7 +7,7 @@
     var map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/standard',
         center: [-1.8802233550562848, 52.46858250430878],
-        zoom: 16,
+        zoom: 17,
         pitch: 75,
         bearing: -17.6,
         container: 'map',
@@ -16,7 +16,8 @@
     });
 
     const loadExtras = true;
-const lightPresets = {
+    
+    const lightPresets = {
         sunrise: {
               "id": "sunrise_light",
               "type": "directional",
@@ -333,6 +334,7 @@ const lightPresets = {
 
     const mapDiv = document.getElementById('map');
     const menuDiv = document.getElementById('menu');
+    const lightLevelDiv = document.getElementById('lightlevel');
 
     mapDiv.appendChild(document.getElementById('control-panel'));
     if(menuDiv != null){
