@@ -121,7 +121,9 @@
     <div id="map"></div>
     <div id="basemap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Change basemap"><img alt="Change basemap" class="basemap" style="padding:3px;margin-left: 2px;" src="./images/basemap.svg" width="25" height="25"></button></div>
     <div id="menu">
-        <input id="satellite-streets-v12" type="radio" name="rtoggle" value="satellite" checked="checked">
+        <input id="standard" type="radio" name="rtoggle" value="standard" checked="checked">
+        <label for="standard">standard</label>
+        <input id="satellite-streets-v12" type="radio" name="rtoggle" value="satellite">
         <label for="satellite-streets-v12">satellite streets</label>
         <input id="light-v11" type="radio" name="rtoggle" value="light">
         <label for="light-v11">light</label>
@@ -129,8 +131,12 @@
         <label for="dark-v11">dark</label>
         <input id="streets-v12" type="radio" name="rtoggle" value="streets">
         <label for="streets-v12">streets</label>
-        <input id="outdoors-v12" type="radio" name="rtoggle" value="outdoors" checked="checked">
-        <label for="outdoors-v12">outdoors</label>
+    </div>
+    <div id="lightlevel">
+        <button aria-label="Change light to sunrise"><img alt="Change light to sunrise" name="sunrise" style="padding:3px;margin-left: 2px;" src="/static/images/sunrise-solid.png" width="25" height="25"></button>
+        <button aria-label="Change light to day"><img alt="Change light to day" name="noon" style="padding:3px;margin-left: 2px;" src="/static/images/sun-solid.svg" width="25" height="25"></button>
+        <button aria-label="Change light to sunset"><img alt="Change light to sunset" name="sunset" style="padding:3px;margin-left: 2px;" src="/static/images/sunset-solid.png" width="25" height="25"></button>
+        <button aria-label="Change light to night"><img alt="Change light to night" name="night" style="padding:3px;margin-left: 2px;" src="/static/images/moon-solid.svg" width="25" height="25"></button>
     </div>
     <div id="info-pane">
         <a href="javascript:void(0)" style="float: right;" class="closeinfobtn">×</a>
