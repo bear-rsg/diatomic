@@ -231,6 +231,24 @@
     float: right;
 }
 
+#lightlevel {
+    width: 160px;
+    background-color: white;
+    z-index: 500;
+    position: fixed;
+    top: 10px;
+    left: 262px;
+    height: 36px;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+}
+
+#lightlevel button {
+    position: relative;
+    padding: 5px;
+}
+
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
   .control-panel {padding-top: 15px;}
