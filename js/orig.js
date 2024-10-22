@@ -6,7 +6,7 @@
     
     var map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/standard',
-        center: [-1.8802233550562848, 52.46858250430878],
+        center: [-1.9003634597200305, 52.475594328826155],
         zoom: 17,
         pitch: 75,
         bearing: -17.6,
