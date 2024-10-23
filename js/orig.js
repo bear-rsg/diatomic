@@ -64,6 +64,10 @@
        }
     };
 
+    map.on('load', () => {
+       buildFilter([ "epcTypeA", "epcTypeB", "epcTypeC", "epcTypeD", "epcTypeE", "epcTypeF", "epcTypeG" ]);
+    });
+
     function changeLightPreset(preset) {
         var lightSettings = lightPresets[preset];
         map.setLights([lightSettings]);
