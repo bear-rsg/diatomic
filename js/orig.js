@@ -131,8 +131,6 @@
 
     function clearFoundFeatures() {
         if(map.getLayer('found-layer')){
-            $('#collapse2').collapse('show');
-            $('#collapse3').collapse('show');
             map.removeLayer('found-layer');
             map.removeSource('found');
         }
@@ -733,6 +731,7 @@
 
             var foundSourceFeatures = [];
             if(map.getLayer('found-layer')){
+                $('#collapse2').collapse('show');
                 $('#collapse3').collapse('show');
                 $('h4.panel-title > a[href="#collapse3"]').text("Lasso values");
                 foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['found-layer']}), "UPRN");
