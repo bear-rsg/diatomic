@@ -197,10 +197,8 @@
 
         function buildFilter(arr) {
         var epcToggleArray = arr;
-        console.log("epcToggleArray: "+epcToggleArray);
-
+        
         if(map.getLayer('epc-layer')){
-            console.log("filter applying");
 
             const epcA_range = [92, 93, 94, 95, 96, 97, 98, 99, 100];
             const epcB_range = [81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91];
@@ -250,8 +248,7 @@
                 }
                 if(epcToggleArray.includes('epcTypeB')){
                     epcFilter = epcFilter.concat(epcG_range);
-                }
-                console.log("epcFilter: "+epcFilter);
+                }                
             }
 
             var filter_type = 'current-energy-efficiency';
@@ -259,18 +256,15 @@
             var selFilter = [];
             var selFilter2 = [];
             var multipleFilters = false;
-            if(noneOnly == true){
-                console.log("filtertype: none only");
+            if(noneOnly == true){                
                 selFilter = ['!', ['in', ['get', filter_type], ['literal', epcFilterAll]]];
             }else{
                 if((epcFilterSet == true) && (epcShowNone == true)){
-                    console.log("filtertype: epcs and none");
                     multipleFilters = true;
                     selFilter = ['in', ['get', filter_type], ['literal', epcFilter]];
                     selFilter2 = ['!has', ['get', filter_type]]; // show non-epc rated buildings
 
-                }else if(epcFilterSet == true){
-                    console.log("filtertype: epcs only");
+                }else if(epcFilterSet == true){                    
                     selFilter = ['in', ['get', filter_type], ['literal', epcFilter]];
                 }
             }
@@ -370,8 +364,7 @@
         
         var featureSet = removeDuplicates(epcRenderedFeatures, "UPRN");
 
-        if (!featureSet.length) { 
-            console.log("no epc data found");
+        if (!featureSet.length) {             
             return;
         }
 
@@ -559,8 +552,7 @@
                     },
                     'fill-extrusion-height': 15,
                     'fill-extrusion-opacity': 0.8,
-                },
-                'filter': ['>=', 'current-energy-efficiency', 0]
+                }
             });
         }
 
