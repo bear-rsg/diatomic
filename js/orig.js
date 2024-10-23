@@ -131,9 +131,13 @@
 
     function clearFoundFeatures() {
         if(map.getLayer('found-layer')){
+            $('#collapse2').collapse('show');
+            $('#collapse3').collapse('show');
             map.removeLayer('found-layer');
             map.removeSource('found');
         }
+        $('#collapse2').collapse('hide');
+        $('#collapse3').collapse('hide');
     }
 
     function buildHistogramData(foundSrcFeat, histType){
