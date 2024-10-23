@@ -7,7 +7,7 @@
     var map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/standard',
         center: [-1.9003634597200305, 52.475594328826155],
-        zoom: 17,
+        zoom: 16,
         pitch: 75,
         bearing: -17.6,
         container: 'map',
@@ -195,6 +195,101 @@
         }
     }
 
+        function buildFilter(arr) {
+        var epcToggleArray = arr;
+        console.log("epcToggleArray: "+epcToggleArray);
+
+        if(map.getLayer('epc-layer')){
+            console.log("filter applying");
+
+            const epcA_range = [92, 93, 94, 95, 96, 97, 98, 99, 100];
+            const epcB_range = [81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91];
+            const epcC_range = [69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80];
+            const epcD_range = [55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68];
+            const epcE_range = [39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54];
+            const epcF_range = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38];
+            const epcG_range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+            var epcFilter = [];
+            var epcFilterAll = [];
+            epcFilterAll = epcFilterAll.concat(epcA_range).concat(epcB_range).concat(epcC_range).concat(epcD_range).concat(epcE_range).concat(epcF_range).concat(epcG_range);
+
+            var epcShowNone = false;
+            if(epcToggleArray.includes('epcTypeNone')){
+                epcShowNone = true;
+            }
+            var toggleCnt = epcToggleArray.length;
+            var noneOnly = false;
+            if((toggleCnt == 1) && (epcShowNone == true)){
+                noneOnly = true;
+            }
+            var noToggleSet = false;
+            if(toggleCnt == 0){
+                noToggleSet = true;
+            }
+            var epcFilterSet = false;
+
+            if((noneOnly == false) && (noToggleSet == false)){
+                epcFilterSet = true;
+                if(epcToggleArray.includes('epcTypeA')){
+                    epcFilter = epcFilter.concat(epcA_range);
+                }
+                if(epcToggleArray.includes('epcTypeB')){
+                    epcFilter = epcFilter.concat(epcB_range);
+                }
+                if(epcToggleArray.includes('epcTypeC')){
+                    epcFilter = epcFilter.concat(epcC_range);
+                }
+                if(epcToggleArray.includes('epcTypeD')){
+                    epcFilter = epcFilter.concat(epcD_range);
+                }
+                if(epcToggleArray.includes('epcTypeE')){
+                    epcFilter = epcFilter.concat(epcE_range);
+                }
+                if(epcToggleArray.includes('epcTypeF')){
+                    epcFilter = epcFilter.concat(epcF_range);
+                }
+                if(epcToggleArray.includes('epcTypeB')){
+                    epcFilter = epcFilter.concat(epcG_range);
+                }
+                console.log("epcFilter: "+epcFilter);
+            }
+
+            var filter_type = 'current-energy-efficiency';
+            //filter_type = 'potential-energy-efficiency';
+            var selFilter = [];
+            var selFilter2 = [];
+            var multipleFilters = false;
+            if(noneOnly == true){
+                console.log("filtertype: none only");
+                selFilter = ['!', ['in', ['get', filter_type], ['literal', epcFilterAll]]];
+            }else{
+                if((epcFilterSet == true) && (epcShowNone == true)){
+                    console.log("filtertype: epcs and none");
+                    multipleFilters = true;
+                    selFilter = ['in', ['get', filter_type], ['literal', epcFilter]];
+                    selFilter2 = ['!has', ['get', filter_type]]; // show non-epc rated buildings
+
+                }else if(epcFilterSet == true){
+                    console.log("filtertype: epcs only");
+                    selFilter = ['in', ['get', filter_type], ['literal', epcFilter]];
+                }
+            }
+            if(selFilter.length > 0){
+                if(multipleFilters){
+                    map.setFilter('epc-layer', ['any',
+                         ['in', ['get', filter_type], ['literal', epcFilter]],
+                         ['!', ['in', ['get', filter_type], ['literal', epcFilterAll]]]
+                    ]);
+                }else{
+                    map.setFilter('epc-layer', selFilter);
+                }
+            }else{
+                map.setFilter('epc-layer', ['>', ['get', filter_type], 100]);
+            }
+        }
+
+    }
+
     function foundLassoFeatures(fpolygonsArr){
         var foundArr = fpolygonsArr;        
         var fc = turf.featureCollection(foundArr);
@@ -354,6 +449,9 @@
     }
     if(document.getElementById('diatomicModal') != null){
         mapDiv.appendChild(document.getElementById('diatomicModal'));
+    }
+    if(document.getElementById('lightLevelDiv') != null){
+        mapDiv.appendChild(document.getElementById('lightLevelDiv'));
     }
 
     const inputs = menuDiv.getElementsByTagName('input');
@@ -785,14 +883,14 @@
             clearFoundFeatures();
         });
 
-        $('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
+        //$('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
 
         $( "#menu" ).hide();
         $('#control-panel').hide();
 
-        $('#basemap_div').click(function(){
-            $('#menu').toggle('slow');
-        });
+        //$('#basemap_div').click(function(){
+        //    $('#menu').toggle('slow');
+        //});
 
         $('.open_panel').click(function(){
             $('#control-panel').toggle();
@@ -983,7 +1081,36 @@
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
             }
         };
-        
+
+        var activeEpcFilters = [];
+
+        const filterNav = document.getElementById('filter-group-epc-type');
+        const epcToggleOpts = filterNav.getElementsByClassName('toggletrigger');
+
+        function updateActiveEpcFilters(){
+            activeEpcFilters = [];
+            const filtNav = document.getElementById('filter-group-epc-type');
+            const epcTglOpts = filtNav.getElementsByClassName('toggletrigger');
+            for (const epcToggleOpt of epcTglOpts) {
+                var is_active = false;
+                var aria = epcToggleOpt.querySelector('.ui-switcher').getAttribute('aria-checked');
+                if(aria == 'true'){
+                    is_active = true;
+                }
+
+                if(is_active) {
+                    var active_val = epcToggleOpt.querySelector('.epc-check-input').getAttribute('value');
+                    activeEpcFilters.push(active_val);
+                }
+
+            }
+            buildFilter(activeEpcFilters);
+        }
+
+        Array.prototype.forEach.call(epcToggleOpts, function(epcToggleOpt) {
+            epcToggleOpt.addEventListener('change', updateActiveEpcFilters);
+        });
+
         const lightOpts = lightLevelDiv.getElementsByTagName('img');
         for (const opt of lightOpts) {
             opt.onclick = (lightObj) => {
