@@ -216,6 +216,12 @@
                         </nav>
                         <hr>
                         <h5>EPC Rating options</h5>
+                        <div id="epc_rating_options"  class="btn-group" role="group" aria-label="Filter Type">
+                            <input type="radio" id="curr_epc" name="rating_type" value="eff" class="form-check-input" checked="checked">
+                            <label for="curr">Current</label>
+                            <input type="radio" id="pot_epc" name="rating_type" value="pot" class="form-check-input">
+                            <label for="pot">Potential</label>
+                        </div>
                         <nav id="filter-group-epc-type" class="">
                             <div class="form-check form-check-inline toggletrigger" id="epcTypeAtogglediv">
                                 <input class="form-check-input epc-check-input" type="checkbox" id="epcTypeA_toggle" value="epcTypeA" checked="checked">
