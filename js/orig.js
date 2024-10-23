@@ -65,7 +65,7 @@
     };
 
     map.on('load', () => {
-       buildFilter([ "epcTypeA", "epcTypeB", "epcTypeC", "epcTypeD", "epcTypeE", "epcTypeF", "epcTypeG" ]);
+       buildFilter([ "epcTypeA", "epcTypeB", "epcTypeC", "epcTypeD", "epcTypeE", "epcTypeF", "epcTypeG" ], 'current-energy-efficiency');
     });
 
     function changeLightPreset(preset) {
@@ -199,7 +199,8 @@
         }
     }
 
-        function buildFilter(arr) {
+        function buildFilter(arr, ftype) {
+        var filter_type = ftype;
         var epcToggleArray = arr;
         
         if(map.getLayer('epc-layer')){
@@ -255,8 +256,6 @@
                 }                
             }
 
-            var filter_type = 'current-energy-efficiency';
-            //filter_type = 'potential-energy-efficiency';
             var selFilter = [];
             var selFilter2 = [];
             var multipleFilters = false;
@@ -427,6 +426,7 @@
     const mapDiv = document.getElementById('map');
     const menuDiv = document.getElementById('menu');
     const lightLevelDiv = document.getElementById('lightlevel');
+    const epcRatingOptionsNav = document.getElementById('epc_rating_options');
 
     mapDiv.appendChild(document.getElementById('control-panel'));
     if(menuDiv != null){
@@ -1082,6 +1082,11 @@
 
         const filterNav = document.getElementById('filter-group-epc-type');
         const epcToggleOpts = filterNav.getElementsByClassName('toggletrigger');
+        const epcRadioOpts = document.getElementsByName('rating_type');
+
+        Array.prototype.forEach.call(epcRadioOpts, function(epcRadioOpt) {
+            epcRadioOpt.addEventListener('change', updateActiveEpcFilters);
+        });
 
         function updateActiveEpcFilters(){
             activeEpcFilters = [];
@@ -1100,7 +1105,13 @@
                 }
 
             }
-            buildFilter(activeEpcFilters);
+            
+            var epcType = 'current-energy-efficiency';
+            if (epcRatingOptionsNav.querySelector('#pot_epc').checked) {
+              epcType = 'potential-energy-efficiency';
+            }
+            
+            buildFilter(activeEpcFilters, epcType);
         }
 
         Array.prototype.forEach.call(epcToggleOpts, function(epcToggleOpt) {
