@@ -22,9 +22,9 @@
             "id": "sunrise_light",
             "type": "directional",
             "properties": {
-                "color": "hsl(35, 100%, 80%)",
-                "intensity": 0.4,
-                "direction": [95.0, 40.0],
+                "color": "hsl(41, 100%, 80%)",
+                "intensity": 0.5,
+                "direction": [15.0, 40.0],
                 "cast-shadows": true,
                 "shadow-intensity": 0.8
             }
