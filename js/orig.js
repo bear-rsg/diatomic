@@ -33,9 +33,9 @@
             "id": "noon_light",
             "type": "directional",
             "properties": {
-                "color": "hsl(35, 100%, 100%)",
-                "intensity": 0.6,
-                "direction": [90.0, 40.0],
+                "color": "hsl(56, 100%, 94%)",
+                "intensity": 0.4,
+                "direction": [80.0, 40.0],
                 "cast-shadows": true,
                 "shadow-intensity": 0.1
             }
@@ -44,9 +44,9 @@
             "id": "sunset_light",
             "type": "directional",
             "properties": {
-                "color": "hsl(35, 100%, 80%)",
+                "color": "hsl(35, 90%, 80%)",
                 "intensity": 0.4,
-                "direction": [170.0, 40.0],
+                "direction": [190.0, 40.0],
                 "cast-shadows": true,
                 "shadow-intensity": 0.8
             }
@@ -55,7 +55,7 @@
             "id": "night_light",
             "type": "directional",
             "properties": {
-                "color": "hsl(200, 50%, 40%)",
+                "color": "hsl(200, 50%, 50%)",
                 "intensity": 1.0,
                 "direction": [270, 40.0],
                 "cast-shadows": true,
