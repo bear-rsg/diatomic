@@ -19,15 +19,15 @@
     
     const lightPresets = {
         sunrise: {
-              "id": "sunrise_light",
-              "type": "directional",
-              "properties": {
-                  "color": "rgba(255.0, 0.0, 0.0, 0.4)",
-                  "intensity": 0.43,
-                  "direction": [200.0, 40.0],
-                  "cast-shadows": true,
-                  "shadow-intensity": 0.8
-              }
+            "id": "sunrise_light",
+            "type": "directional",
+            "properties": {
+                "color": "hsl(35, 100%, 80%)",
+                "intensity": 0.4,
+                "direction": [95.0, 40.0],
+                "cast-shadows": true,
+                "shadow-intensity": 0.8
+            }
         },
         noon: {
             "id": "noon_light",
@@ -44,9 +44,9 @@
             "id": "sunset_light",
             "type": "directional",
             "properties": {
-                "color": "hsl(20, 80%, 60%)",
-                "intensity": 1.0,
-                "direction": [1.5, 40.0],
+                "color": "hsl(35, 100%, 80%)",
+                "intensity": 0.4,
+                "direction": [170.0, 40.0],
                 "cast-shadows": true,
                 "shadow-intensity": 0.8
             }
@@ -61,7 +61,18 @@
                 "cast-shadows": true,
                 "shadow-intensity": 0.2
             }
-       }
+        },
+        cancel: {
+            "id": "cancel_light",
+            "type": "directional",
+            "properties": {
+                "color": "hsl(20, 80%, 60%)",
+                "intensity": 0.0,
+                "direction": [0, 0],
+                "cast-shadows": false,
+                "shadow-intensity": 0.
+            }
+        },
     };
 
     map.on('load', () => {
