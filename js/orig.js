@@ -76,14 +76,15 @@
     };
 
     map.on('load', () => {
+       map.setConfigProperty('basemap', 'lightPreset', 'day');
        buildFilter([ "epcTypeA", "epcTypeB", "epcTypeC", "epcTypeD", "epcTypeE", "epcTypeF", "epcTypeG" ], 'current-energy-efficiency');
     });
 
     function changeLightPreset(preset) {
-        var lightSettings = lightPresets[preset];
-        map.setLights([lightSettings]);
+        //var lightSettings = lightPresets[preset];
+        //map.setLights([lightSettings]);
+        map.setConfigProperty('basemap', 'lightPreset', preset);
     }
-
     map.addControl(
         new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,            
