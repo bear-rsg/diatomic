@@ -232,7 +232,7 @@
 }
 
 #lightlevel {
-    width: 160px;
+    width: 150px;
     background-color: white;
     z-index: 500;
     position: fixed;
@@ -246,7 +246,20 @@
 
 #lightlevel button {
     position: relative;
-    padding: 5px;
+    padding: 0 2px;
+    border: none;
+    background: white;
+    top: 3.5px;
+}
+
+#lightlevel button:hover {
+    background-color: #e7e8e5;
+    border-radius: 4px;
+}
+
+#lightlevel button img {
+    padding: 2px;
+    margin: 2px;
 }
 
 #hist_options,
