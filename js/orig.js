@@ -442,9 +442,9 @@
     const epcRatingOptionsNav = document.getElementById('epc_rating_options');
 
     mapDiv.appendChild(document.getElementById('control-panel'));
-    if(menuDiv != null){
-        mapDiv.appendChild(menuDiv);
-    }
+    //if(menuDiv != null){
+    //    mapDiv.appendChild(menuDiv);
+    //}
     if(document.getElementById('loader') != null){
         mapDiv.appendChild(document.getElementById('loader'));
     }
