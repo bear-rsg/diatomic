@@ -437,7 +437,7 @@
     }
 
     const mapDiv = document.getElementById('map');
-    const menuDiv = document.getElementById('menu');
+    //const menuDiv = document.getElementById('menu');
     const lightLevelDiv = document.getElementById('lightlevel');
     const epcRatingOptionsNav = document.getElementById('epc_rating_options');
 
@@ -464,14 +464,14 @@
         mapDiv.appendChild(document.getElementById('lightLevelDiv'));
     }
 
-    const inputs = menuDiv.getElementsByTagName('input');
+    //const inputs = menuDiv.getElementsByTagName('input');
 
-    for (const input of inputs) {
+    /*for (const input of inputs) {
         input.onclick = (layer) => {
             const layerId = layer.target.id;
             map.setStyle('mapbox://styles/mapbox/' + layerId);
         };
-    }
+    }*/
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-left');
     map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
@@ -895,7 +895,7 @@
 
         //$('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
 
-        $( "#menu" ).hide();
+        //$( "#menu" ).hide();
         $('#control-panel').hide();
 
         //$('#basemap_div').click(function(){
