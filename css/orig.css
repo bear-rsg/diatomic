@@ -168,11 +168,11 @@
     position: absolute;
     bottom: 7vh;
     left: 1vw;
-    height: 30px;
-    width: 30px;
+    height: 36px;
+    width: 36px;
     z-index: 2;
-    background: url('../images/epc_info.png') #fff;
-    border-radius: 3px;
+    background: url('../images/epc_info.png') #fff 2px 2px;
+    border-radius: 6px;
 }
 
 .filter-group {
