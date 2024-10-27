@@ -848,7 +848,7 @@
                     maintainAspectRatio: false,
                     layout: {
                         padding: {
-                            bottom: 16
+                            bottom: 30
                         }
                     },
                     scales: {
