@@ -446,6 +446,9 @@
     //if(menuDiv != null){
     //    mapDiv.appendChild(menuDiv);
     //}
+    if(lightLevelDiv != null){
+        mapDiv.appendChild(lightLevelDiv);
+    }
     if(document.getElementById('loader') != null){
         mapDiv.appendChild(document.getElementById('loader'));
     }
