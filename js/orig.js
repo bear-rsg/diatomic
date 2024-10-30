@@ -614,7 +614,7 @@
             if(!map.getSource('heatmap')){
                 map.addSource('heatmap', {
                     type: 'geojson',
-                    data: 'http://127.0.0.1:8000/static/js/data/heat-network-layer-epsg4326a.geojson'
+                    data: 'https://bear-rsg.github.io/diatomic/js/data/heat-network-layer-epsg4326a.geojson'
                 });
                 map.addLayer({
                    'id': 'heatmap-layer',
