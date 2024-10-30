@@ -95,7 +95,7 @@
         },
     };
 
-    map.on('load', () => {map.on('load', () => {
+    map.on('load', () => {
        map.resize();
        map.addControl(deckOverlay);
        map.setConfigProperty('basemap', 'lightPreset', 'day');
