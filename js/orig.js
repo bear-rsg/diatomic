@@ -930,7 +930,7 @@
                     'visibility',
                     'visible'
                 );
-                map.moveLayer('chargepoints', 'google-3d-tiles');
+                //map.moveLayer('chargepoints', 'google-3d-tiles');
 
             }
 
