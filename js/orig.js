@@ -15,6 +15,37 @@
 
     });
 
+
+    const googleTilesLayer = new deck.Tile3DLayer({
+        id: 'google-3d-tiles',
+        data: 'https://tile.googleapis.com/v1/3dtiles/root.json?key=AIzaSyBiSqMy2mo-_26_9XDoU5VTevOOo_GSCWQ', // CHANGEME!
+        loaderOptions: {
+            tilesetUrl: 'https://3dtiles.googleapis.com/v1/maps/',
+            '3d-tiles': {
+                fetchOptions: {
+                    mode: 'cors'
+                }
+            },
+            showCreditsOnScreen: true
+        },
+        pickable: true,
+        pointSize: 2,
+    });
+
+    const deckOverlay = new MapboxOverlay({
+        interleaved: true,
+        initialViewState: {
+            longitude: -1.8952129084026341,
+            latitude: 52.479069298525694,
+            zoom: 18.5,
+            pitch: 75,
+            bearing: 17.6
+        },
+        layers: [googleTilesLayer],
+        beforeId: 'firstSymbolId'
+    });
+
+
     const loadExtras = true;
     
     const lightPresets = {
@@ -75,9 +106,15 @@
         },
     };
 
-    map.on('load', () => {
+    map.on('load', () => {map.on('load', () => {
+       map.resize();
+       map.addControl(deckOverlay);
        map.setConfigProperty('basemap', 'lightPreset', 'day');
        buildFilter([ "epcTypeA", "epcTypeB", "epcTypeC", "epcTypeD", "epcTypeE", "epcTypeF", "epcTypeG" ], 'current-energy-efficiency');
+       if(map.getLayer('google-3d-tiles')){
+           map.setLayoutProperty('google-3d-tiles', 'visibility', 'none');
+       }
+       startSpinner();
     });
 
     function changeLightPreset(preset) {
@@ -496,30 +533,36 @@
         const features = e.features[0];        
 
         const coordinates = features.geometry.coordinates;
+           var msg = '';
         if(features['properties']['current-energy-efficiency']) {
             msg = '' + features['properties']['current-energy-efficiency'];
         }else{
             msg = '-';
         }
+        var msg2 = '';
         if(features['properties']['potential-energy-efficiency']) {
             msg2 = '' + features['properties']['potential-energy-efficiency'];
         }else{
             msg2 = '-';
         }
+        var msg3 = '';
         if(features['properties']['UPRN']) {
             msg3 = '' + features['properties']['UPRN'];
         }else{
             msg3 = '-';
         }
 
-
+        var msg4 = '';
         if(coordinates != null){
             var coord_feature = coordinates;
-            msg4_all = '' + coord_feature;
-            msg4_arr = msg4_all.split(',');
+            var msg4_all = '' + coord_feature;
+            var msg4_arr = msg4_all.split(',');
+            //for(var i = 0; i < 2; i++) {
+             //  msg4_arr[i] = msg4_arr[i].replace(/^\s*/, "").replace(/\s*$/, "");
                msg4 = "\n";
                msg4 += msg4_arr[0]+"\n";
                msg4 += msg4_arr[1]+"\n";
+            //}
         }else{
             msg4 = '-';
 
@@ -548,7 +591,7 @@
         map.on('idle', stopSpinner);
     }
 
-    stopSpinner = (e) => {        
+    const stopSpinner = (e) => {        
         document.getElementById("loader").style.visibility = "hidden";
         map.off('idle', stopSpinner);       
         setChanged(1);
@@ -578,6 +621,28 @@
         }
 
         if(loadExtras){
+            if(!map.getSource('heatmap')){
+                map.addSource('heatmap', {
+                    type: 'geojson',
+                    data: 'http://127.0.0.1:8000/static/js/data/heat-network-layer-epsg4326a.geojson'
+                });
+                map.addLayer({
+                   'id': 'heatmap-layer',
+                   'source': 'heatmap',
+                   'layout': {
+                       'visibility': 'none'
+                   },
+                   'minzoom': 10,
+                   'maxzoom': 15,
+                   'type': 'fill',
+                   'paint': {
+                       'fill-color': '#f23ed6',
+                       'fill-outline-color': 'rgba(0, 0, 0, 0.2)',
+                       'fill-opacity': 0.5
+                   }
+               });
+            }
+            
             if(!map.getSource('wards')){
                 map.addSource('wards', {
                     type: 'geojson',
@@ -730,7 +795,7 @@
         var removeID = "#"+canvasId;
         $(removeID).remove();
         $("<canvas id='" + canvasId + "'><canvas>").insertAfter( "#hist_options" );
-        selected_value = $("input[name='chart_type']:checked").val();
+        var selected_value = $("input[name='chart_type']:checked").val();
         if(selected_value == 'eff'){
             $('#effChart').removeClass('hidden');
             $('#potChart').addClass('hidden');
@@ -755,7 +820,7 @@
                 foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['epc-layer']}), "UPRN");
             }
 
-            foundSourceFeaturesCnt = foundSourceFeatures.length;
+            var foundSourceFeaturesCnt = foundSourceFeatures.length;
             var hist_eff_data = [];
             var hist_pot_data = [];
             if (foundSourceFeaturesCnt > 0){
@@ -766,7 +831,7 @@
             const currBgroundColour = [];
             const currLabelValues = [];
 
-            for(i=0; i < hist_eff_data.length; i++) {
+            for(var i=0; i < hist_eff_data.length; i++) {
                 if(hist_eff_data[i].x >=0 && hist_eff_data[i].x <= 20) { currBgroundColour.push('hsl(357,82%,53%)') }
                 if(hist_eff_data[i].x >=21 && hist_eff_data[i].x <= 38) { currBgroundColour.push('hsl(20,87%,56%)') }
                 if(hist_eff_data[i].x >=39 && hist_eff_data[i].x <= 54) { currBgroundColour.push('hsl(38,91%,59%)') }
@@ -896,11 +961,34 @@
         $('.mapbox-gl-draw_trash').on("mousedown", function() {
             clearFoundFeatures();
         });
+        
+        $('#threedmap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
+
+        $('#control-panel').hide();
+
+        $('#threedmap_div').click(function(){
+            const clickedLayer = 'google-3d-tiles';
+            const visibility = map.getLayoutProperty(
+                clickedLayer,
+                'visibility'
+            );
+
+            if (visibility === 'visible') {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            } else {
+                map.setLayoutProperty(
+                    clickedLayer,
+                    'visibility',
+                    'visible'
+                );
+                map.moveLayer('chargepoints', 'google-3d-tiles');
+
+            }
+
+        });
 
         //$('#basemap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
-
         //$( "#menu" ).hide();
-        $('#control-panel').hide();
 
         //$('#basemap_div').click(function(){
         //    $('#menu').toggle('slow');
@@ -924,7 +1012,7 @@
         });
 
         $('#hist_options').change(function(){
-            selected_value = $("input[name='chart_type']:checked").val();
+            var selected_value = $("input[name='chart_type']:checked").val();
             if(selected_value == 'eff'){
                 $('#effChart').removeClass('hidden');
                 $('#potChart').addClass('hidden');
@@ -1020,6 +1108,8 @@
         var checkbox_link = document.querySelector('#lsoaListtogglediv');
         var checkbox_link2 = document.querySelector('#wardBoundariestogglediv');
         var checkbox_link3 = document.querySelector('#chPointstogglediv');
+        var checkbox_link4 = document.querySelector('#heatmaptogglediv');
+
 
         var checkbox_layer = '';
 
@@ -1089,6 +1179,30 @@
                 toggle_on = true;
             }
             
+            if(toggle_on) {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            }
+        };
+
+        checkbox_link4.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if($(this).attr('id') == 'heatmaptogglediv'){
+                checkbox_layer = 'heatmap-layer';
+            }
+
+            var clickedLayer = checkbox_layer;
+
+            var is_active = $(this).find('.ui-switcher').attr('aria-checked');
+            var toggle_on = false;
+            if(is_active == 'true'){
+                toggle_on = true;
+            }
+
+            // Toggle layer visibility by changing the layout object's visibility property.
             if(toggle_on) {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
             } else {
