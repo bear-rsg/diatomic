@@ -93,17 +93,6 @@
                 "shadow-intensity": 0.2
             }
         },
-        cancel: {
-            "id": "cancel_light",
-            "type": "directional",
-            "properties": {
-                "color": "hsl(20, 80%, 60%)",
-                "intensity": 0.0,
-                "direction": [0, 0],
-                "cast-shadows": false,
-                "shadow-intensity": 0.
-            }
-        },
     };
 
     map.on('load', () => {map.on('load', () => {
@@ -122,6 +111,7 @@
         //map.setLights([lightSettings]);
         map.setConfigProperty('basemap', 'lightPreset', preset);
     }
+                          
     map.addControl(
         new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,            
@@ -130,7 +120,6 @@
             mapboxgl: mapboxgl
         }), 'top-left'
     );
-
 
     var changed_vals = true;
 
@@ -248,7 +237,6 @@
                 {x: 91, y: perc_eff_a }
             ];
         }
-    }
 
         function buildFilter(arr, ftype) {
         var filter_type = ftype;
@@ -456,6 +444,7 @@
 
         }
         alert("found " + foundFeatures + " features inside boundary");
+        
         var round = Math.round;
         var averageEfficiency = round(totalEPC / foundFeatures);
         var potentialEfficiency = round(totalPotentialEPC / foundFeatures);
