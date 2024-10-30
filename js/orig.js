@@ -237,8 +237,9 @@
                 {x: 91, y: perc_eff_a }
             ];
         }
-
-        function buildFilter(arr, ftype) {
+    }
+    
+    function buildFilter(arr, ftype) {
         var filter_type = ftype;
         var epcToggleArray = arr;
         
