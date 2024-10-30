@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="./favicon.ico">
     <script src='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css' rel='stylesheet' />
-    <script src="https://unpkg.com/deck.gl@^6.2.0/deckgl.min.js"></script>
+    <script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
     <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" type="text/css">
@@ -29,11 +29,12 @@
     <link rel="stylesheet" href="./css/orig.css">
 
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Roboto, sans-serif;
-        }
+       html,
+       body {
+          height:100%;
+          margin: 0;
+          padding: 0;
+       }
         h2,
         h3 {
             margin: 10px;
@@ -70,6 +71,14 @@
             top: 0;
         }
 
+        #control-panel,
+        #effChart,
+        #potChart{
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+        }
+
         #control-panel {
             position: absolute;
             margin: 56px 12px;
@@ -78,7 +87,6 @@
             line-height: 1.5;
             z-index: 3;
             background: #f9f9f9;
-            font-family: Helvetica, Arial, sans-serif;
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
             color: #222;
             width: 22.5%;
@@ -114,12 +122,17 @@
             font-size: 14px;
             color: #187b64;
         }
+        #credits { position: absolute; bottom: 0; right: 0; padding: 2px; font-size: 15px; color: white;
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;}
     </style>
 </head>
     <body>
         <button id="side-panel-btn" class="open_panel">☰</button>
     <div id="map"></div>
-    <!-- div id="basemap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Change basemap"><img alt="Change basemap" class="basemap" style="padding:3px;margin-left: 2px;" src="./images/basemap.svg" width="25" height="25"></button></div -->
+    <div id="credits"></div>
+    <!--  insert this after load into position at top-left block -->
+    <!-- div id="basemap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Change basemap"><img alt="Change basemap" class="basemap" style="padding:3px;margin-left: 2px;" src="/static/images/basemap.svg" width="25" height="25"></button></div -->
+    <div id="threedmap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Toggle 3d maps"><img alt="Change to 3d map" class="threedmap" style="padding:3px;margin-left: 2px;" src="/static/images/3d-icon.png" width="25" height="25"></button></div>
     <!-- div id="menu">
         <input id="standard" type="radio" name="rtoggle" value="standard" checked="checked">
         <label for="standard">standard</label>
@@ -214,6 +227,10 @@
                                 <input class="form-check-input" type="checkbox" id="chPoints_toggle" value="chPoints">
                                 <label for="chPoints_toggle">Charge Points</label>
                             </div>
+                            <div class="form-check form-check-inline toggletrigger" id="heatmaptogglediv">
+                                <input class="form-check-input" type="checkbox" id="heatmap_toggle" value="chPoints">
+                                <label for="heatmap_toggle">Heatmap</label>
+                            </div>
                         </nav>
                         <hr>
                         <h5>EPC Rating options</h5>
@@ -269,6 +286,6 @@
             $.switcher('input[type=checkbox]');
         });
     </script>
-    <script src="./js/orig.js"></script>
+    <script type="module" src="./js/orig.js"></script>
 </body>
 </html>
