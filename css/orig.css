@@ -171,7 +171,7 @@
     height: 36px;
     width: 36px;
     z-index: 2;
-    background: url('../images/epc_info.png') #fff no-repeat 2px 2px
+    background: url('../images/epc_info.png') #fff no-repeat 2px 2px;
     border-radius: 6px;
     border: transparent;
 }
