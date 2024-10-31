@@ -3,7 +3,8 @@
 
     // CHANGEME!
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbHllbHc0c24wM2V4MnJzYjd6d3NhcDQ5In0.NqG44ctju4Fm25dTP8GqZQ';
-    
+
+    // Initialize mapbox map
     var map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/standard',
         center: [-1.8952129084026341, 52.479069298525694],
@@ -12,9 +13,7 @@
         bearing: 17.6,
         container: 'map',
         antialias: true
-
     });
-
 
     const googleTilesLayer = new deck.Tile3DLayer({
         id: 'google-3d-tiles',
