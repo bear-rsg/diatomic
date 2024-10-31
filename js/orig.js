@@ -2,7 +2,7 @@
     const {MapboxOverlay} = deck;
 
     // CHANGEME!
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbTJ4NDFxZTUwMG93MmpzZWplZGxmcXpnIn0.hUd47BFdGttWAJoxSi_v4g';
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2VyeXNsZXdpcyIsImEiOiJjbHllbHc0c24wM2V4MnJzYjd6d3NhcDQ5In0.NqG44ctju4Fm25dTP8GqZQ';
 
     // Initialize mapbox map
     var map = new mapboxgl.Map({
