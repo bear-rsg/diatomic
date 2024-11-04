@@ -601,7 +601,7 @@
                 'paint': {                    
                     'fill-extrusion-color': {
                         property: 'current-energy-efficiency',
-                        stops: [[0, '#d4340d'], [21, '#f06e2d'], [39, '#f8b368'], [55, '#f0c713'], [69, '#8cc637'], [81, '#1bb359'], [92, '#02895d']]
+                        stops: [[0, '#000000'], [21, '#d4340d'], [39, '#f06e2d'], [55, '#f8b368'], [69, '#f0c713'], [81, '#8cc637'], [92, '#1bb359'], [100, '#02895d']]
                     },
                     'fill-extrusion-height': 15,
                     'fill-extrusion-opacity': 0.8,
