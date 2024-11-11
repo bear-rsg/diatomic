@@ -665,23 +665,22 @@ function getCurrentDisplayInfo(){
             .addTo(map);
 
     });
-
+    
     map.on('click', 'wardBoundaries', (e) => {
 
         $('#control-panel').show();
         $('#collapse1').collapse('show');
 
         const features = e.features[0];
-    
-        // Copy coordinates array
+       
         const coordinates = features.geometry.coordinates;
-         if(features.geometry.type == 'MultiPolygon'){
+        if(features.geometry.type == 'MultiPolygon'){
            var coords = coordinates[0][0][0];
         }else{
            var coords = coordinates[0][0];
 
         }
-    
+       
         let ward_id = features['properties']['OBJECTID'];
         let ward_21CD = features['properties']['WD21CD'];
         let ward_21NM = features['properties']['WD21NM'];
