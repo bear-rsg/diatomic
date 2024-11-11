@@ -193,6 +193,41 @@
         }), 'top-left'
     );
 
+function getCurrentDisplayInfo(){
+        var zoom = map.getZoom();
+        const zoom_str = zoom.toString();
+        const zoom_trim = zoom_str.slice(0, 4);
+        var centre = map.getCenter(); 
+        const lat_str = centre['lat'].toString();
+        const lat = lat_str.slice(0, 6);
+        const lng_str = centre['lng'].toString();
+        const lng = lng_str.slice(0, 7);
+        var pitch = map.getPitch();
+        const pitch_str = pitch.toString();
+        const pitch_trim = pitch_str.slice(0, 4);
+        var bearing = map.getBearing();
+        const bearing_str = bearing.toString();
+        const bearing_trim = bearing_str.slice(0, 5);
+        var toggleArr = []; 
+        let valuesDict = { 'zoom': zoom_trim, 'centre_lat': lat, 'centre_lng': lng, 'pitch': pitch_trim, 'bearing': bearing_trim, 'toggles': toggleArr };
+        return valuesDict;
+    }
+
+    document.getElementById("map").addEventListener('mousemove', function() {
+        let currDisplayInfo = getCurrentDisplayInfo();
+        //alert(JSON.stringify(currDisplayInfo));
+        let zoom = currDisplayInfo['zoom'];
+        let centre_lat = currDisplayInfo['centre_lat'];
+        let centre_lng = currDisplayInfo['centre_lng'];
+        let pitch = currDisplayInfo['pitch'];
+        let bearing = currDisplayInfo['bearing'];
+        document.getElementById("zoom-val").innerHTML = zoom;
+        document.getElementById("centre-val").innerHTML = centre_lat + ', ' + centre_lng;
+        document.getElementById("pitch-val").innerHTML = pitch;
+        document.getElementById("bearing-val").innerHTML = bearing;
+    });
+
+
     function clearFoundFeatures() {
         if(map.getLayer('found-layer')){
             map.removeLayer('found-layer');
@@ -376,7 +411,7 @@
             'source': 'found', 
             'paint': {
                 'fill-extrusion-color': '#053ef7',
-                'fill-extrusion-height': 20,
+                'fill-extrusion-height': 30,
                 'fill-extrusion-opacity': 0.8,
             }
         });
@@ -431,7 +466,7 @@
              'sourceLayer': 'epc-layer'
         });
         
-        var featureSet = removeDuplicates(epcRenderedFeatures, "UPRN");
+        var featureSet = removeDuplicates(epcSourceFeatures, "UPRN");
 
         if (!featureSet.length) {             
             return;
@@ -510,6 +545,12 @@
     }
     if(document.getElementById('info-pane') != null){
         mapDiv.appendChild(document.getElementById('info-pane'));
+    }
+    if(document.getElementById('values-pane') != null){
+        mapDiv.appendChild(document.getElementById('values-pane'));
+    }
+    if(document.getElementById('values-pane-btn') != null){
+        mapDiv.appendChild(document.getElementById('values-pane-btn'));
     }
     if(document.getElementById('info-pane-btn') != null){
         mapDiv.appendChild(document.getElementById('info-pane-btn'));
@@ -723,8 +764,8 @@ map.on('click', 'wardBoundaries', (e) => {
                         property: 'current-energy-efficiency',
                         stops: [[0, '#000000'], [21, '#d4340d'], [39, '#f06e2d'], [55, '#f8b368'], [69, '#f0c713'], [81, '#8cc637'], [92, '#1bb359'], [100, '#02895d']]
                     },
-                    'fill-extrusion-height': 15,
-                    'fill-extrusion-opacity': 0.8,
+                    'fill-extrusion-height': 30,
+                    'fill-extrusion-opacity': 0.9,
                 }
             });
         }
@@ -908,10 +949,10 @@ map.on('click', 'wardBoundaries', (e) => {
                 $('#collapse2').collapse('show');
                 $('#collapse3').collapse('show');
                 $('h4.panel-title > a[href="#collapse3"]').text("Lasso values");
-                foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['found-layer']}), "UPRN");
+                    foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['found-layer']}), "UPRN");
             }else{
                 $('h4.panel-title > a[href="#collapse3"]').text("Overview");
-                foundSourceFeatures = removeDuplicates(map.queryRenderedFeatures({layers: ['epc-layer']}), "UPRN");
+                foundSourceFeatures = map.querySourceFeatures('epc', {'sourceLayer': 'epc-layer'});
             }
 
             var foundSourceFeaturesCnt = foundSourceFeatures.length;
@@ -1432,11 +1473,20 @@ map.on('click', 'wardBoundaries', (e) => {
 
         $('.closeinfobtn').click(function(){
             $('#info-pane').toggle('slow');
+        });$('.closevaluesbtn').click(function(){
+            $('#values-pane').toggle('slow');
+            $('#values-pane-btn').toggle('slow');
         });
 
         $('#info-pane-btn').click(function(){
             $('#info-pane').toggle('slow');
         });
+
+        $('#values-pane-btn').click(function(){
+            $('#values-pane').toggle('slow');
+            $('#values-pane-btn').toggle('slow');
+        });
+        $('#values-pane-btn').toggle('slow');
 
         $('#hist_options').change(function(){
             var selected_value = $("input[name='chart_type']:checked").val();
@@ -1562,6 +1612,7 @@ map.on('click', 'wardBoundaries', (e) => {
 
             if(toggle_on) {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                zoomHigherFlat();
             } else {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
             }
@@ -1585,8 +1636,11 @@ map.on('click', 'wardBoundaries', (e) => {
 
             if(toggle_on) {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                zoomHigherFlat();
             } else {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                map.setLayoutProperty('wardBoundaries_borders', 'visibility', 'none');
+            }
             }
         };
 
@@ -1632,6 +1686,7 @@ map.on('click', 'wardBoundaries', (e) => {
             // Toggle layer visibility by changing the layout object's visibility property.
             if(toggle_on) {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                zoomHigherFlat();
             } else {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
             }
