@@ -148,8 +148,9 @@
         });
         return;
     }
-
-    function flatView() {       
+    
+    function flatView() {
+        console.log("going to flat view");
         map.jumpTo({
             pitch: 0,
             bearing: 0
@@ -157,6 +158,15 @@
         return;
     }
 
+    function angleView() {
+        console.log("going to angle view");
+        map.jumpTo({
+            pitch: 75,
+            bearing: 17.6
+        });
+        return;
+    }
+    
     function setChanged(opt){
         if(opt==1){
             changed_vals = true;
