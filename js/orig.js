@@ -96,7 +96,7 @@
 
     map.on('load', () => {
        map.resize();
-       map.addControl(deckOverlay);
+       //map.addControl(deckOverlay);
        map.setConfigProperty('basemap', 'lightPreset', 'day');
        buildFilter([ "epcTypeA", "epcTypeB", "epcTypeC", "epcTypeD", "epcTypeE", "epcTypeF", "epcTypeG" ], 'current-energy-efficiency');
        if(map.getLayer('google-3d-tiles')){
@@ -104,6 +104,15 @@
        }
        startSpinner();
     });
+
+    function makeRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
 
     function changeLightPreset(preset) {
         //var lightSettings = lightPresets[preset];
@@ -122,7 +131,17 @@
 
     var changed_vals = true;
 
-    function flatView() {        
+    function zoomHigherFlat() {
+        console.log("going to flat view");
+        map.jumpTo({
+            pitch: 0,
+            bearing: 0,
+            zoom: 12
+        });
+        return;
+    }
+
+    function flatView() {       
         map.jumpTo({
             pitch: 0,
             bearing: 0
@@ -566,13 +585,106 @@
         document.getElementById('pot-eff').setAttribute('data-color', msg2);
         document.getElementById('uprn').innerHTML = msg3;
 
+        let popupHTML = '<div class="tab"><button class="tablinks" onclick="openEpc(event, \'Current\')">Current</button>'+
+            '<button class="tablinks" onclick="openEpc(event, \'Potential\')">Potential</button>'+
+            '<button class="tablinks" onclick="openEpc(event, \'Other\')">Other</button></div>'+
+            '<div id="Current" class="tabcontent active"><p><strong>Current Efficiency:</strong> <span class="">' + msg + '<span></p></div>'+
+            '<div id="Potential" class="tabcontent"><p><strong>Potential Efficiency:</strong> <span class="">' + msg2 + '<span></p></div>'+
+            '<div id="Other" class="tabcontent"><p><strong>UPRN:</strong>' + features['properties']['UPRN'] + '</p>'+
+            '<p><strong>Lat:</strong> ' + coords[1] + '<br ><strong>Long:</strong> ' + coords[0]+'</p></div>'
 
-        /* var popup = new mapboxgl.Popup({ offset: [0, -15] })
-            .setLngLat(coordinates)
-            .setHTML('<h3>EPC Info</h3><p>' + msg + '</p>')
+        var popup = new mapboxgl.Popup({ offset: [5, -30] })
+            .setLngLat(coords)
+            //.setHTML('<h3>EPC Info</h3><p><strong>Current Efficiency:</strong> <span class="">' + msg + '<span></p><p><strong>Potential Efficiency:</strong> <span class="">' + msg2 + '<span></p><p><strong>UPRN:</strong>' + features['properties']['UPRN'] + '</p><p><strong>Latitude:</strong> ' + coords[1] + '<br ><strong>Longitude:</strong> ' + coords[0]+'</p>')
+            .setHTML(popupHTML)
             .addTo(map);
-        */
 
+    });
+map.on('click', 'wardBoundaries', (e) => {
+
+        $('#control-panel').show();
+        $('#collapse1').collapse('show');
+
+        const features = e.features[0];
+        console.log("features(all): "+ JSON.stringify(features));
+
+        // Copy coordinates array
+        const coordinates = features.geometry.coordinates;
+         if(features.geometry.type == 'MultiPolygon'){
+           var coords = coordinates[0][0][0];
+        }else{
+           var coords = coordinates[0][0];
+
+        }
+        console.log("coordinates: "+ coordinates);
+
+        let ward_id = features['properties']['OBJECTID'];
+        let ward_21CD = features['properties']['WD21CD'];
+        let ward_21NM = features['properties']['WD21NM'];
+        let ward_21NMW = features['properties']['WD21NMW'];
+        let ward_BNG_E = features['properties']['BNG_E'];
+        let ward_long = features['properties']['LONG'];
+        let ward_lat = features['properties']['LAT'];
+        let ward_area = features['properties']['Shape__Area'];
+        let ward_length = features['properties']['Shape__Length'];
+
+        var popup = new mapboxgl.Popup({ offset: [0, 0] })
+            .setLngLat(coords)
+            .setHTML('<h3>Ward Info</h3>'+
+            '<p><strong>ID:</strong><span class="">' + ward_id + '<span></p>'+
+            '<p><strong>WD21CD:</strong><span class="">' + ward_21CD + '<span></p>'+
+            '<p><strong>WD21NM:</strong><span class="">' + ward_21NM + '<span></p>'+
+            '<p><strong>WD21NMW:</strong><span class="">' + ward_21NMW + '<span></p>'+
+            '<p><strong>BNG_E:</strong><span class="">' + ward_BNG_E + '<span></p>'+
+            '<p><strong>Area:</strong><span class="">' + ward_area + '<span></p>'+
+            '<p><strong>Length:</strong><span class="">' + ward_length + '<span></p>')
+            .addTo(map);
+    });
+
+    map.on('click', 'lsoaChoropleth', (e) => {
+
+        $('#control-panel').show();
+        $('#collapse1').collapse('show');
+
+        const features = e.features[0];
+        console.log("features(all): "+ JSON.stringify(features));
+
+        // Copy coordinates array
+        const coordinates = features.geometry.coordinates;
+        if(features.geometry.type == 'MultiPolygon'){
+            var coords = coordinates[0][0][0];
+        }else{
+            var coords = coordinates[0][0];
+        }
+        console.log("coordinates: "+ coordinates);
+
+        let lsoa_11NM = features['properties']['LSOA11NM'];
+        let lsoa_11CD = features['properties']['LSOA11CD'];
+        let lsoa_11NMW = features['properties']['LSOA11NMW'];
+        let lsoa_area = features['properties']['Shape__Are'];
+        let lsoa_length = features['properties']['Shape__Len'];
+        let lsoa_comment = features['properties']['Project comment'];
+        let lsoa_EBIGS = features['properties']['EBIGS area'];
+        let lsoa_RESIDENT_POPULATION = features['properties']['RESIDENT_POPULATION'];
+        let lsoa_CHILD_0_15_YRS = features['properties']['CHILD_0_15_YRS'];
+        let lsoa_AGED_16_64_YRS = features['properties']['AGED_16_64_YRS'];
+        let lsoa_AGED_65__YRS = features['properties']['AGED_65__YRS'];
+        let lsoa_LIVES_IN_COMMUNAL_ESTABLISHMENT = features['properties']['LIVES_IN_COMMUNAL_ESTABLISHMENT'];
+        let lsoa_PERSONS_WITH_LIMITING_LONG_TERM_CONDITION = features['properties']['PERSONS_WITH_LIMITING_LONG_TERM_CONDITION'];
+        let lsoa_BORN_OVERSEAS = features['properties']['BORN_OVERSEAS'];
+        let lsoa_WHITE = features['properties']['WHITE'];
+        let lsoa_MULTIPLE_ETHNICITY = features['properties']['MULTIPLE_ETHNICITY'];
+        let lsoa_ASIAN = features['properties']['ASIAN'];
+        let lsoa_BLACK = features['properties']['BLACK'];
+        let lsoa_ARAB_AND_OTHER = features['properties']['ARAB_AND_OTHER'];
+       
+        var popup = new mapboxgl.Popup({ offset: [5, -30] })
+        .setLngLat(coords)
+        .setHTML('<h3>LSOA Info</h3>'+
+        '<p><strong>11NM:</strong><span class="">' + lsoa_11NM + '<span></p>'+
+        '<p><strong>Area:</strong><span class="">' + lsoa_area + '<span></p>'+
+        '<p><strong>Length:</strong><span class="">' + lsoa_length + '<span></p>')
+        .addTo(map);
     });
 
     function startSpinner() {
@@ -648,8 +760,30 @@
                     },
                     'minzoom': 10,
                     'maxzoom': 15,
+                          'paint': {
+                        'fill-color': ['feature-state', 'color'],
+                        //'fill-color': '#385dce',
+                        'fill-outline-color': 'rgba(0, 0, 0, 0.2)',
+                        'fill-opacity': 0.3,
+                    }
+                });
+
+                map.addLayer({
+                    'id': 'wardBoundaries_borders',
+                    'type': 'line',
+                    'source': 'wards', // reference the data source
+                    'layout': {
+                        // Make the layer non-visible by default - turn on by checkbox toggle
+                        'visibility': 'none',
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    'minzoom': 10,
+                    'maxzoom': 15,
                     'paint': {
-                        'line-color': '#385dce',                         
+                        'line-color': '#385dce', // blue color fill
+                        // 'fill-opacity': 1,
+                        // 'line-width': 3
                         'line-width': {
                             'type': 'exponential',
                             'stops': [
@@ -660,6 +794,10 @@
                     }
                 });
             }
+            if(!map.getFeatureState({ id: 'features[0].id', source: 'wards' }).color) {
+                map.setFeatureState({ id: 'features[0].id', source: 'wards' }, { color: makeRandomColor() });
+            }
+
             if(!map.getSource('lsoas')){
                 map.addSource('lsoas', {
                     type: 'geojson',
@@ -892,6 +1030,335 @@
         } */
     });
 
+    // TIMESERIES
+
+    // Set up the checkbox menu
+    function createCheckboxes() {
+
+        // Select the container div
+        var DISPLAY_OPTIONS = document.getElementById('data-display-opts');
+
+        // Setting up options for checkboxes
+        const AVAILABLE_DISPLAY_OPTIONS = [
+            {
+                id: 1,
+                datatype: 'datapoints_net_demand',
+                name: 'Net Demand',
+                value: 'trace1',
+                holder: 'datapoints_net_demand_div'
+            },
+            {
+                id: 2,
+                datatype: 'datapoints_generation',
+                name: 'Generation',
+                value: 'trace2',
+                holder: 'datapoints_generation_div'
+            },
+            {
+                id: 3,
+                datatype: 'datapoints_import',
+                name: 'Import',
+                value: 'trace3',
+                holder: 'datapoints_import_div'
+            },
+            {
+                id: 4,
+                datatype: 'datapoints_solar',
+                name: 'Solar',
+                value: 'trace4',
+                holder: 'datapoints_solar_div'
+            },
+            {
+                id: 5,
+                datatype: 'datapoints_wind',
+                name: 'Wind',
+                value: 'trace5',
+                holder: 'datapoints_wind_div'
+            },
+            {
+                id: 6,
+                datatype: 'datapoints_stor',
+                name: 'STOR',
+                value: 'trace6',
+                holder: 'datapoints_stor_div'
+            },
+            {
+                id: 7,
+                datatype: 'datapoints_other',
+                name: 'Other',
+                value: 'trace7',
+                holder: 'datapoints_other_div'
+            }
+        ];
+
+        var SELECTED_DISPLAY_OPTION = 1; 
+
+        for (const DISPLAY_OPTION of AVAILABLE_DISPLAY_OPTIONS) {
+
+            const checkboxItem = document.createElement('div');
+            const checkboxInput = document.createElement('input');
+            const checkboxLabel = document.createElement('label');
+
+            // Assign attributes
+            checkboxItem.className = "div-flex-row form-check-inline toggletrigger";
+            checkboxItem.id = DISPLAY_OPTION.holder;
+
+            checkboxInput.className = "checkbox-data-type"
+            checkboxInput.type = 'checkbox';
+            checkboxInput.name = 'toggle-display-option';
+
+            checkboxInput.id = DISPLAY_OPTION.datatype;
+            checkboxInput.value = DISPLAY_OPTION.value;
+            checkboxInput.checked = DISPLAY_OPTION.id === SELECTED_DISPLAY_OPTION;
+
+            checkboxLabel.htmlFor = DISPLAY_OPTION.datatype;
+            checkboxLabel.innerText = DISPLAY_OPTION.name;
+
+            // Append the input and label elements to the checkboxItem div.
+            checkboxItem.appendChild(checkboxInput);
+            checkboxItem.appendChild(checkboxLabel);
+
+            // Append the checkboxItem div to the containerItem div that will contain all the checkboxes.
+            DISPLAY_OPTIONS.appendChild(checkboxItem);
+
+        }
+
+    }
+
+    // Call the function to create and append checkboxes
+    createCheckboxes();
+
+    var rawDataURL = 'https://bear-rsg.github.io/diatomic/js/data/lea-marston_wmids.csv';
+    var dataOptions = {
+            options: [
+
+            ]
+        };
+
+    var xField = 'Date';
+    var yField = 'All';
+
+    var selectorOptions = {
+        buttons: [{
+            step: 'minutes',
+            stepmode: 'backward',
+            count: 1,
+            label: '5mins'
+        },
+        {
+            step: 'minutes',
+            stepmode: 'backward',
+            count: 30,
+            label: '30mins'
+        },
+        {
+            step: 'hours',
+            stepmode: 'backward',
+            count: 1,
+            label: 'hour'
+        }],
+    };
+
+    d3.csv(rawDataURL, function(err, rows){
+
+        if(err) throw err;
+
+        function unpack(rows, key) {
+
+            return rows.map(function(row) { return row[key]; });
+
+        }
+
+        // Extracting values for the slider
+        const datapoints_timestamp = unpack(rows, 'Timestamp');
+        const datapoints_net_demand = unpack(rows, 'Net Demand');
+        const datapoints_generation = unpack(rows, 'Generation');
+        const datapoints_import = unpack(rows, 'Import');
+        const datapoints_solar = unpack(rows, 'Solar');
+        const datapoints_wind = unpack(rows, 'Wind');
+        const datapoints_stor = unpack(rows, 'STOR');
+        const datapoints_other = unpack(rows, 'Other');
+        const num_datapoints = datapoints_timestamp.length - 1;
+
+        const min_timestamp = new Date(Math.min.apply(null, datapoints_timestamp.map(function(e) {
+                                return new Date(e);
+                              })));
+        const max_timestamp = new Date(Math.max.apply(null, datapoints_timestamp.map(function(e) {
+                                  return new Date(e);
+                                })));
+
+        const min_net_demand = Math.min(...datapoints_net_demand);
+        const max_net_demand = Math.max(...datapoints_net_demand);
+
+        function prepData(rows, selected_display_option) {
+
+            var x = datapoints_timestamp;
+            console.log('x:' + x);
+            var y = datapoints_net_demand; //selected_display_option;
+            console.log('y:' + y);
+            console.log(rows.length)
+
+            rows.forEach(function(datum, i) {
+                if(i % 100) return;
+
+                x.push(new Date(datum[xField]));
+                y.push(datum[yField]);
+            });
+
+            return [{
+                mode: 'lines',
+                x: x,
+                y: y
+            }];
+        }
+
+        var trace1 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Net Demand",
+            x: datapoints_timestamp,
+            y: datapoints_net_demand,
+            line: { color: "#17becf" }
+        };
+        var trace2 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Generation",
+            x: datapoints_timestamp,
+            y: datapoints_generation,
+            line: { color: "#d40dd1" }
+        };
+        var trace3 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Import",
+            x: datapoints_timestamp,
+            y: datapoints_import,
+            line: { color: "#c82f2f" }
+        };
+        var trace4 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Solar",
+            x: datapoints_timestamp,
+            y: datapoints_solar,
+            line: { color: "#fbf868" }
+        };
+        var trace5 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Wind",
+            x: datapoints_timestamp,
+            y: datapoints_wind,
+            line: { color: "#1508a6" }
+        };
+        var trace6 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Stored",
+            x: datapoints_timestamp,
+            y: datapoints_stor,
+            line: { color: "#0b0b0b" }
+        };
+        var trace7 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Other",
+            x: datapoints_timestamp,
+            y: datapoints_other,
+            line: { color: "#489341" }
+        };
+        const allTraces = { trace1, trace2, trace3, trace4, trace5, trace6, trace7 };
+
+        var layout = {
+            plot_bgcolor: "rgba(0,0,0,0)",
+            paper_bgcolor: "rgba(0,0,0,0)",
+            width: 600,
+            height: 380,
+            title: 'Lea Marston - GSP Time Series',
+            font: {
+                //color: 'aqua' TODO: ALT COLOURS
+                color: '#333'
+            },
+            xaxis: {
+                autorange: true,
+                range: [min_timestamp, max_timestamp],
+                rangeselector: {buttons: [
+                    {
+                      count: 30,
+                      label: '30min',
+                      step: 'minute',
+                      stepmode: 'backward'
+                    },
+                    {
+                      count: 1,
+                      label: '1h',
+                      step: 'hour',
+                      stepmode: 'backward'
+                    },
+                    {
+                      count: 1,
+                      label: '1d',
+                      step: 'day',
+                      stepmode: 'backward'
+                    },
+                    {
+                      count: 7,
+                      label: '1w',
+                      step: 'day',
+                      stepmode: 'backward'
+                    },
+                    {
+                      count: 1,
+                      label: '1m',
+                      step: 'month',
+                      stepmode: 'backward'
+                    },
+                    {
+                      count: 3,
+                      label: '3m',
+                      step: 'month',
+                      stepmode: 'backward'
+                    },
+
+                    {step: 'all'}
+
+                ]},
+                rangeslider: {range: [min_timestamp, max_timestamp] },
+                type: 'date'
+            },
+
+            yaxis: {
+                autorange: true,
+                range: [min_net_demand, max_net_demand],
+                type: 'linear'
+            }
+
+        };
+
+
+        // Function to update plot based on selected checkboxes
+        function updatePlot() {
+            const selectedTraces = [];
+            document.querySelectorAll('#data-display-opts input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedTraces.push(allTraces[checkbox.value]);
+                }
+            });
+
+            // Update plot with the selected traces
+            Plotly.react('gsp-plot', selectedTraces, layout);
+        }
+
+        // Add event listeners to checkboxes
+        document.querySelectorAll('#data-display-opts input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updatePlot);
+        });
+
+        updatePlot();
+    });
+
+    
     $(document).ready(function(){
 
         $('.mapbox-gl-draw_ctrl-draw-btn').on("mousedown", function() {
