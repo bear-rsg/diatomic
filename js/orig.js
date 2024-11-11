@@ -815,16 +815,17 @@ function getCurrentDisplayInfo(){
                 });
                 map.addLayer({
                     'id': 'wardBoundaries',
-                    'type': 'line',
-                    'source': 'wards', 
+                    'type': 'fill',
+                    'source': 'wards', // reference the data source
                     'layout': {
+                        // Make the layer non-visible by default - turn on by checkbox toggle
                         'visibility': 'none',
                         'line-join': 'round',
                         'line-cap': 'round'
                     },
                     'minzoom': 10,
                     'maxzoom': 15,
-                          'paint': {
+                    'paint': {
                         'fill-color': ['feature-state', 'color'],
                         //'fill-color': '#385dce',
                         'fill-outline-color': 'rgba(0, 0, 0, 0.2)',
@@ -846,8 +847,6 @@ function getCurrentDisplayInfo(){
                     'maxzoom': 15,
                     'paint': {
                         'line-color': '#385dce', // blue color fill
-                        // 'fill-opacity': 1,
-                        // 'line-width': 3
                         'line-width': {
                             'type': 'exponential',
                             'stops': [
