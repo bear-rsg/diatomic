@@ -597,10 +597,17 @@ function getCurrentDisplayInfo(){
         $('#control-panel').show();
         $('#collapse1').collapse('show');
 
-        const features = e.features[0];        
-
+        const features = e.features[0];
+        
         const coordinates = features.geometry.coordinates;
-           var msg = '';
+         if(features.geometry.type == 'MultiPolygon'){
+           var coords = coordinates[0][0][0];
+        }else{
+           var coords = coordinates[0][0];
+
+        }
+
+        var msg = '';
         if(features['properties']['current-energy-efficiency']) {
             msg = '' + features['properties']['current-energy-efficiency'];
         }else{
@@ -624,12 +631,9 @@ function getCurrentDisplayInfo(){
             var coord_feature = coordinates;
             var msg4_all = '' + coord_feature;
             var msg4_arr = msg4_all.split(',');
-            //for(var i = 0; i < 2; i++) {
-             //  msg4_arr[i] = msg4_arr[i].replace(/^\s*/, "").replace(/\s*$/, "");
                msg4 = "\n";
                msg4 += msg4_arr[0]+"\n";
                msg4 += msg4_arr[1]+"\n";
-            //}
         }else{
             msg4 = '-';
 
@@ -639,18 +643,20 @@ function getCurrentDisplayInfo(){
         const potentialEfficiency = features['properties']['potential-energy-efficiency'];
 
         document.getElementById('cur-eff').innerHTML = msg;
+
         document.getElementById('cur-eff').setAttribute('data-color', msg);
         document.getElementById('pot-eff').innerHTML = msg2;
+
         document.getElementById('pot-eff').setAttribute('data-color', msg2);
         document.getElementById('uprn').innerHTML = msg3;
 
         let popupHTML = '<div class="tab"><button class="tablinks" onclick="openEpc(event, \'Current\')">Current</button>'+
-            '<button class="tablinks" onclick="openEpc(event, \'Potential\')">Potential</button>'+
-            '<button class="tablinks" onclick="openEpc(event, \'Other\')">Other</button></div>'+
-            '<div id="Current" class="tabcontent active"><p><strong>Current Efficiency:</strong> <span class="">' + msg + '<span></p></div>'+
-            '<div id="Potential" class="tabcontent"><p><strong>Potential Efficiency:</strong> <span class="">' + msg2 + '<span></p></div>'+
-            '<div id="Other" class="tabcontent"><p><strong>UPRN:</strong>' + features['properties']['UPRN'] + '</p>'+
-            '<p><strong>Lat:</strong> ' + coords[1] + '<br ><strong>Long:</strong> ' + coords[0]+'</p></div>'
+        '<button class="tablinks" onclick="openEpc(event, \'Potential\')">Potential</button>'+
+        '<button class="tablinks" onclick="openEpc(event, \'Other\')">Other</button></div>'+
+        '<div id="Current" class="tabcontent active"><p><strong>Current Efficiency:</strong> <span class="">' + msg + '<span></p></div>'+
+        '<div id="Potential" class="tabcontent"><p><strong>Potential Efficiency:</strong> <span class="">' + msg2 + '<span></p></div>'+
+        '<div id="Other" class="tabcontent"><p><strong>UPRN:</strong>' + features['properties']['UPRN'] + '</p>'+
+        '<p><strong>Lat:</strong> ' + coords[1] + '<br ><strong>Long:</strong> ' + coords[0]+'</p></div>';
 
         var popup = new mapboxgl.Popup({ offset: [5, -30] })
             .setLngLat(coords)
