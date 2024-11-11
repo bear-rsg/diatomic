@@ -131,8 +131,16 @@
 
     var changed_vals = true;
 
+    function jumpToView(center_val, zoom_val, pitch_val, bearing_val) {
+        map.jumpTo({
+            center: center_val,
+            zoom: zoom_val,
+            pitch: pitch_val,
+            bearing: bearing_val
+        });
+        return;
+    }
     function zoomHigherFlat() {
-        console.log("going to flat view");
         map.jumpTo({
             pitch: 0,
             bearing: 0,
