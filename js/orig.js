@@ -1430,6 +1430,14 @@ function getCurrentDisplayInfo(){
 
         $('#control-panel').hide();
 
+        $('#dimensionstoggle_div').click(function(){
+            if(map.getPitch() != 0){
+                flatView();
+            }else{
+                angleView();
+            }
+        });
+
         $('#threedmap_div').click(function(){
             const clickedLayer = 'google-3d-tiles';
             const visibility = map.getLayoutProperty(
