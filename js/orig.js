@@ -1408,11 +1408,15 @@ map.on('click', 'wardBoundaries', (e) => {
         //$('#basemap_div').click(function(){
         //    $('#menu').toggle('slow');
         //});
-
         $('.open_panel').click(function(){
             $('#control-panel').toggle();
             $('#potChart').addClass('hidden');
         });
+
+        $('#time_series_gsp_btn').click(function(){
+            $('#time_series_gsp').toggle('slow');
+        });
+        $('#time_series_gsp').toggle('slow');
 
         $('.closebtn').click(function(){
             $('#control-panel').toggle('slow');
