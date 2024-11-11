@@ -1426,7 +1426,8 @@ map.on('click', 'wardBoundaries', (e) => {
             clearFoundFeatures();
         });
         
-        $('#threedmap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
+        //$('#threedmap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
+        $('#dimensionstoggle_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
 
         $('#control-panel').hide();
 
