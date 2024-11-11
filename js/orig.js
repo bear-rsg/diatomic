@@ -649,14 +649,14 @@ function getCurrentDisplayInfo(){
             .addTo(map);
 
     });
-map.on('click', 'wardBoundaries', (e) => {
+
+    map.on('click', 'wardBoundaries', (e) => {
 
         $('#control-panel').show();
         $('#collapse1').collapse('show');
 
         const features = e.features[0];
-        console.log("features(all): "+ JSON.stringify(features));
-
+    
         // Copy coordinates array
         const coordinates = features.geometry.coordinates;
          if(features.geometry.type == 'MultiPolygon'){
@@ -665,8 +665,7 @@ map.on('click', 'wardBoundaries', (e) => {
            var coords = coordinates[0][0];
 
         }
-        console.log("coordinates: "+ coordinates);
-
+    
         let ward_id = features['properties']['OBJECTID'];
         let ward_21CD = features['properties']['WD21CD'];
         let ward_21NM = features['properties']['WD21NM'];
@@ -1635,15 +1634,17 @@ map.on('click', 'wardBoundaries', (e) => {
                 toggle_on = true;
             }
 
+            // Toggle layer visibility by changing the layout object's visibility property.
             if(toggle_on) {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                map.setLayoutProperty('wardBoundaries_borders', 'visibility', 'visible');
                 zoomHigherFlat();
             } else {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
                 map.setLayoutProperty('wardBoundaries_borders', 'visibility', 'none');
             }
         };
-
+        
         checkbox_link3.onclick = function (e) {
             e.preventDefault();
             e.stopPropagation();
