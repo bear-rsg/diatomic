@@ -65,6 +65,9 @@
 #chPointstogglediv .ui-switcher[aria-checked=true] {
     background-color: #9542fb;
 }
+#heatmaptogglediv .ui-switcher[aria-checked=true] {
+    background-color: #f23ed6;
+}
 
 #epcTypeAtogglediv .ui-switcher[aria-checked=true] {
     background-color: #02895d;
@@ -96,4 +99,32 @@
 
 #epcTypeNonetogglediv .ui-switcher[aria-checked=true] {
     background-color: #000;
+}
+
+#datapoints_net_demand_div .ui-switcher[aria-checked=true]{
+    background-color: #17becf;
+}
+
+#datapoints_generation_div .ui-switcher[aria-checked=true]{
+    background-color: #d40dd1;
+}
+
+#datapoints_import_div .ui-switcher[aria-checked=true]{
+    background-color: #c82f2f;
+}
+
+#datapoints_solar_div .ui-switcher[aria-checked=true]{
+    background-color: #fbf868;
+}
+
+#datapoints_wind_div .ui-switcher[aria-checked=true]{
+    background-color: #1508a6;
+}
+
+#datapoints_stor_div .ui-switcher[aria-checked=true]{
+    background-color: #0b0b0b;
+}
+
+#datapoints_other_div .ui-switcher[aria-checked=true]{
+    background-color: #489341;
 }
