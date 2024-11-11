@@ -1641,7 +1641,6 @@ map.on('click', 'wardBoundaries', (e) => {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
                 map.setLayoutProperty('wardBoundaries_borders', 'visibility', 'none');
             }
-            }
         };
 
         checkbox_link3.onclick = function (e) {
