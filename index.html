@@ -132,7 +132,8 @@
     <div id="credits"></div>
     <!--  insert this after load into position at top-left block -->
     <!-- div id="basemap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Change basemap"><img alt="Change basemap" class="basemap" style="padding:3px;margin-left: 2px;" src="./images/basemap.svg" width="25" height="25"></button></div -->
-    <div id="threedmap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Toggle 3d maps"><img alt="Change to 3d map" class="threedmap" style="padding:3px;margin-left: 2px;" src="./images/3d-icon.png" width="25" height="25"></button></div>
+    <!--div id="threedmap_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Toggle 3d maps"><img alt="Change to 3d map" class="threedmap" style="padding:3px;margin-left: 2px;" src="/static/images/3d-icon.png" width="25" height="25"></button></div -->
+    <div id="dimensionstoggle_div" class="mapboxgl-ctrl mapboxgl-ctrl-group"><button aria-label="Toggle flat / 3d map"><img alt="Toggle flat / 3d map" class="dimensions" style="padding:3px;margin-left: 2px;" src="/static/images/3d-icon.png" width="25" height="25"></button></div>
     <!-- div id="menu">
         <input id="standard" type="radio" name="rtoggle" value="standard" checked="checked">
         <label for="standard">standard</label>
@@ -157,6 +158,22 @@
         <img class="epc responsive" src="./images/epc_ratings.png" alt="EPC Ratings">
     </div>
     <button id="info-pane-btn" class="open_info"></button>
+    <div id="values-pane">
+        <a href="javascript:void(0)" style="float: right; text-decoration: none;" class="closevaluesbtn">×</a>
+        Map zoom level: <span id="zoom-val"></span><br>
+        Map centre: <span id="centre-val"></span><br>
+        Map bearing: <span id="bearing-val"></span><br>
+        Map pitch: <span id="pitch-val"></span>
+    </div>
+    <div class="map-overlay top" id="time_series_gsp">
+        <div class="map-overlay-inner" id="data-opts">
+            <h2>Select data types: </h2>
+            <div id="data-display-opts"></div>
+        </div>
+        <div class="map-overlay-inner">
+            <div id="gsp-plot"></div>
+        </div>
+    </div>
     <div id="control-panel" class="sidebar">
         <a href="javascript:void(0)" class="closebtn">×</a>        
         <div class="panel-group" id="accordion">
@@ -284,7 +301,29 @@
             </div>
         </div>
     </div>
-    <div id="loader"></div>    
+            <div id="loader"></div>
+
+        <script>
+            function openEpc(evt, tabName) {
+                // Declare all variables
+                var i, tabcontent, tablinks;
+
+                // Get all elements with class="tabcontent" and hide them
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+
+                // Get all elements with class="tablinks" and remove the class "active"
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.className += " active";
+            }
+        </script>
     <script type="text/javascript" src="./js/jquery.switcher.min.js"></script>
     <script>
         jQuery(function($) {
