@@ -421,7 +421,7 @@ function getCurrentDisplayInfo(){
             'source': 'found', 
             'paint': {
                 'fill-extrusion-color': '#053ef7',
-                'fill-extrusion-height': 30,
+                'fill-extrusion-height': 35,
                 'fill-extrusion-opacity': 0.8,
             }
         });
