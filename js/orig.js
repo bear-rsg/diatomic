@@ -1335,15 +1335,15 @@ function getCurrentDisplayInfo(){
         var layout = {
             plot_bgcolor: "rgba(0,0,0,0)",
             paper_bgcolor: "rgba(0,0,0,0)",
-            width: 600,
-            height: 380,
+            width: 900,
+            height: 440,
             title: 'Lea Marston - GSP Time Series',
             font: {
                 //color: 'aqua' TODO: ALT COLOURS
                 color: '#333'
             },
             xaxis: {
-                autorange: true,
+                //autorange: true,
                 range: [min_timestamp, max_timestamp],
                 rangeselector: {buttons: [
                     {
@@ -1376,12 +1376,12 @@ function getCurrentDisplayInfo(){
                       step: 'month',
                       stepmode: 'backward'
                     },
-                    {
+                    /*{
                       count: 3,
                       label: '3m',
                       step: 'month',
                       stepmode: 'backward'
-                    },
+                    },*/
 
                     {step: 'all'}
 
@@ -1397,8 +1397,6 @@ function getCurrentDisplayInfo(){
             }
 
         };
-
-
         // Function to update plot based on selected checkboxes
         function updatePlot() {
             const selectedTraces = [];
@@ -1407,6 +1405,16 @@ function getCurrentDisplayInfo(){
                     selectedTraces.push(allTraces[checkbox.value]);
                 }
             });
+
+            // Get date range from datepickers
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            if (startDate && endDate) {
+                layout.xaxis.range = [new Date(startDate), new Date(endDate)];
+            } else {
+                layout.xaxis.autorange = true;
+            }
 
             // Update plot with the selected traces
             Plotly.react('gsp-plot', selectedTraces, layout);
@@ -1417,8 +1425,14 @@ function getCurrentDisplayInfo(){
             checkbox.addEventListener('change', updatePlot);
         });
 
+        // Add event listeners for date inputs
+        document.getElementById('start-date').addEventListener('change', updatePlot);
+        document.getElementById('end-date').addEventListener('change', updatePlot);
+
+        // Initial plot
         updatePlot();
     });
+
 
     
     $(document).ready(function(){
