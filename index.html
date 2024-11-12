@@ -167,8 +167,20 @@
     </div>
     <div class="map-overlay top" id="time_series_gsp">
         <div class="map-overlay-inner" id="data-opts">
-            <h2>Select data types: </h2>
-            <div id="data-display-opts"></div>
+            <strong>Options </strong><br />
+            <div>
+                <div id="data-display-opts"></div>
+            </div><br>
+            <div>
+                <div class="date-holder">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date">
+                </div>
+                <div class="date-holder">
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date">
+                </div>
+            </div>
         </div>
         <div class="map-overlay-inner">
             <div id="gsp-plot"></div>
@@ -294,7 +306,7 @@
                             <hr>
                             <h5>Time Series</h5>
                             <button type="button" class="btn btn-primary" id="time_series_gsp_btn">
-                            GSP Data
+                            Lea Marston - GSP Data
                         </button>
                         </nav>
                     </div>
