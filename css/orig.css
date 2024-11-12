@@ -50,8 +50,10 @@ body {
 }
 
 #time_series_gsp.map-overlay {
-    width: 50%;
+    width: 77.5%;
     z-index: 600;
+    overflow: hidden;
+    max-height: 566px;
 }
 
 .map-overlay.nopanel {
@@ -382,10 +384,15 @@ gmp-map-3d {
 }
 #data-opts {
     padding: 15px;
+    height: 134px;
 }
 
 #data-display-opts {
-    height: 56px;
+    height: 12px;
+}
+.date-holder {
+    float: left;
+    padding: 0 16px 0 0;
 }
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
