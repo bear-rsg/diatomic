@@ -1330,6 +1330,7 @@ function getCurrentDisplayInfo(){
             y: datapoints_other,
             line: { color: "#489341" }
         };
+
         const allTraces = { trace1, trace2, trace3, trace4, trace5, trace6, trace7 };
 
         var layout = {
@@ -1397,6 +1398,8 @@ function getCurrentDisplayInfo(){
             }
 
         };
+
+
         // Function to update plot based on selected checkboxes
         function updatePlot() {
             const selectedTraces = [];
@@ -1407,15 +1410,16 @@ function getCurrentDisplayInfo(){
             });
 
             // Get date range from datepickers
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
+            var startDate = document.getElementById('start-date').value;
+            var endDate = document.getElementById('end-date').value;
 
-            if (startDate && endDate) {
+            if(startDate && endDate) {
+                //alert('updating plot with dates: ' + new Date(startDate) + ' and ' + new Date(endDate));
                 layout.xaxis.range = [new Date(startDate), new Date(endDate)];
             } else {
-                layout.xaxis.autorange = true;
+                layout.xaxis.range = [min_timestamp, max_timestamp];
             }
-
+            //alert('updating plot');
             // Update plot with the selected traces
             Plotly.react('gsp-plot', selectedTraces, layout);
         }
