@@ -1284,10 +1284,10 @@ function getCurrentDisplayInfo(){
         {'csv_name': 'Other', 'suffix': 'other', 'color': '#489341'}
     ];
 
+    // Call the function to create and append checkboxes
+    createCheckboxes();
+    
     function timeSeriesDisplay(dataURL, traceOptions){
-        
-        // Call the function to create and append checkboxes
-        createCheckboxes();
         
         var rawDataURL = dataURL;
 
