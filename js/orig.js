@@ -1193,7 +1193,7 @@ function getCurrentDisplayInfo(){
 
     function timeSeriesDisplay(dataURL, traceOptions){
 
-        var rawDataURL = dataURL;
+        var rawDataURL = 'https://bear-rsg.github.io/diatomic/js/data/lea-marston_wmids.csv';
 
         var dataOptions = {
                 options: [
