@@ -1442,11 +1442,10 @@ function getCurrentDisplayInfo(){
         });
 
     }
+    
+    timeSeriesDisplay(leeMarstonDataURL, traceOptions);
 
     $(document).ready(function(){
-
-        timeSeriesDisplay(leeMarstonDataURL, traceOptions);
-
 
         $('.mapbox-gl-draw_ctrl-draw-btn').on("mousedown", function() {
             draw.deleteAll();
