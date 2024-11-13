@@ -1179,7 +1179,7 @@ function getCurrentDisplayInfo(){
     });
 
     // TIMESERIES
-    var leeMarstonDataURL = 'http://127.0.0.1:8000/static/js/data/lea-marston_wmids.csv';
+    var leeMarstonDataURL = 'https://bear-rsg.github.io/diatomic/js/data/lea-marston_wmids.csv';
 
     var traceOptions = [
         {'csv_name': 'Net Demand', 'suffix': 'net_demand', 'color': '#17becf'},
