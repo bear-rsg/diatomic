@@ -189,9 +189,9 @@
 
     map.addControl(draw, 'top-left');
 
-    map.on('draw.create', updateArea);
+    map.on('draw.create', updateLassoArea);
     map.on('draw.delete', clearFoundFeatures);
-    map.on('draw.update', updateArea);
+    map.on('draw.update', updateLassoArea);
 
     map.addControl(
         new mapboxgl.GeolocateControl({
@@ -202,6 +202,21 @@
             showUserHeading: true
         }), 'top-left'
     );
+
+    function getRenderedFeatures(layerName){
+        const renderedFeatures = map.queryRenderedFeatures({
+            layers: [layerName]
+        });
+
+        return renderedFeatures
+    }
+
+    function getSourceFeatures(srcName, layerName){
+        const sourceFeatures = map.querySourceFeatures(srcName, {
+             'sourceLayer': layerName
+        });
+        return sourceFeatures
+    }
 
 function getCurrentDisplayInfo(){
         var zoom = map.getZoom();
@@ -459,69 +474,116 @@ function getCurrentDisplayInfo(){
         return uniqueFeatures;
     }
 
-    function updateArea(e) {
-        var foundFeaturePolygons = [];
+    function dataInDefinedArea(featureDataset, boundaryPoints){
 
-        const data = draw.getAll();
-        const polygonData = data.features[0].geometry.coordinates[0];        
-
-        const searchWithin = turf.polygon([polygonData]);
-        const answer = document.getElementById('calculated-area');
-
+        const areaPolygon = turf.polygon([boundaryPoints]);
         const epcRenderedFeatures = map.queryRenderedFeatures({
             layers: ['epc-layer']
-        });        
-
-        const epcSourceFeatures = map.querySourceFeatures('epc', {
-             'sourceLayer': 'epc-layer'
         });
-        
-        var featureSet = removeDuplicates(epcSourceFeatures, "UPRN");
 
-        if (!featureSet.length) {             
+        var featureSet = featureDataset;
+
+        if (!featureSet.length) {
+            console.log("no epc data found");
             return;
         }
-
+        var foundFeaturePolygons = [];
         var foundFeatures = 0;
         var foundFeatureUprns = "";
         var totalEPC = 0;
         var totalPotentialEPC = 0;
 
+        var returnData = {};
+
         for(var i=0;i<featureSet.length;i++){
 
             var epcObj = featureSet[i];
 
-            if( epcObj['properties']['current-energy-efficiency'] != null ){                
+            if( epcObj['properties']['current-energy-efficiency'] != null ){
                 if(epcObj['geometry']['type']=='MultiPolygon'){
                     var point_data = epcObj['geometry']['coordinates'][0][0][0];
                 }else{
                     var point_data = epcObj['geometry']['coordinates'][0][0];
-                }                
+                }
+                console.log("point_data:" + point_data);
 
-                var pntInPolygon = isPointInPolygon(point_data, polygonData);                
+                var pntInPolygon = isPointInPolygon(point_data, boundaryPoints);
+                console.log("pntInPolygon (" + point_data + "): "+ pntInPolygon);
+                console.log("epcObj['geometry']['coordinates'][0]:" + epcObj['geometry']['coordinates'][0]);
 
                 var featureType = epcObj['geometry']['type'];
                 var featObj = epcObj;
-                
                 if(pntInPolygon) {
                     var currUprn = featObj['properties'].UPRN;
                     foundFeatures++;
                     foundFeaturePolygons.push(featObj);
                     foundFeatureUprns += currUprn + "\n";
                     totalEPC += parseInt(featObj['properties']['current-energy-efficiency']);
-                    totalPotentialEPC += parseInt(featObj['properties']['potential-energy-efficiency']);                    
-                }                
+                    totalPotentialEPC += parseInt(featObj['properties']['potential-energy-efficiency']);
+                    console.log("Feature UPRN: "+ featObj['properties'].UPRN + " ("+featureType+") is inside boundary");
+                }else {
+                    console.log("Feature UPRN: "+ featObj['properties'].UPRN + " ("+featureType+") not inside boundary");
+                }
 
             }
 
         }
+
+        returnData["foundFeaturePolygons"] = foundFeaturePolygons;
+        returnData["foundFeatures"] = foundFeatures;
+        returnData["totalEPC"] = totalEPC;
+        returnData["totalPotentialEPC"] = totalPotentialEPC;
+        returnData["foundFeatureUprns"] = foundFeatureUprns;
+
+        return returnData
+
+    }
+
+    function updateLassoArea(e) {
+        // alert("updating info for lasso");
+
+        const data = draw.getAll();
+        const polygonData = data.features[0].geometry.coordinates[0];
+        //console.log("Boundary polygon points:" + JSON.stringify(polygonData));
+
+        const epcRenderedFeatures = getRenderedFeatures('epc-layer');
+        console.log("epc rendered data found*: " + JSON.stringify(epcRenderedFeatures));
+
+        const epcSourceFeatures = getSourceFeatures('epc', 'epc-layer');
+        console.log("epc source data found*: " + JSON.stringify(epcSourceFeatures));
+
+        var featureSet = removeDuplicates(epcRenderedFeatures, "UPRN");
+
+        var foundFeatures = 0;
+        var foundFeatureUprns = "";
+        var totalEPC = 0;
+        var totalPotentialEPC = 0;
+
+        if (!featureSet.length) {
+            console.log("no epc data found");
+            return;
+        }
+        else{
+            console.log("epcRenderedFeatures length: "+featureSet.length);
+            console.log("epc data found: " + JSON.stringify(featureSet[0]['geometry']['coordinates']));
+        }
+
+        const areaData = dataInDefinedArea(featureSet, polygonData);
+
+        var foundFeaturePolygons = areaData.foundFeaturePolygons;
+        var foundFeatures = areaData.foundFeatures;
+        var totalEPC = areaData.totalEPC;
+        var totalPotentialEPC = areaData.totalPotentialEPC;
+        var foundFeatureUprns = areaData.foundFeatureUprns;
+
         alert("found " + foundFeatures + " features inside boundary");
-        
+
         var round = Math.round;
         var averageEfficiency = round(totalEPC / foundFeatures);
         var potentialEfficiency = round(totalPotentialEPC / foundFeatures);
         var fpolygonsArr = JSON.stringify(foundFeaturePolygons);
-                
+        //var strungFpolygonsArr = JSON.stringify(fpolygonsArr);
+        //console.log("fpolygonsArr: " + strungFpolygonsArr.substring(1,strungFpolygonsArr.length-1));
         if(foundFeatures > 0){
             document.getElementById('avg-eff').innerHTML = averageEfficiency;
             document.getElementById('avg-eff').setAttribute('data-color', averageEfficiency);
@@ -531,6 +593,8 @@ function getCurrentDisplayInfo(){
         }
 
         foundLassoFeatures(foundFeaturePolygons);
+        //alert("polygonData: "+polygonData+"\n\nfoundFeatureUprns: \n\n" + foundFeatureUprns + "");
+        console.log("Found Feature Uprns: \n\n" + foundFeatureUprns + "");
         setChanged(1);
 
     }
@@ -650,17 +714,17 @@ function getCurrentDisplayInfo(){
         document.getElementById('pot-eff').setAttribute('data-color', msg2);
         document.getElementById('uprn').innerHTML = msg3;
 
-        let popupHTML = '<div class="tab"><button class="tablinks" onclick="openEpc(event, \'Current\')">Current</button>'+
+         let popupHTML = '<div class="tab"><button class="tablinks" onclick="openEpc(event, \'Current\')">Current</button>'+
         '<button class="tablinks" onclick="openEpc(event, \'Potential\')">Potential</button>'+
         '<button class="tablinks" onclick="openEpc(event, \'Other\')">Other</button></div>'+
-        '<div id="Current" class="tabcontent active"><p><strong>Current Efficiency:</strong> <span class="">' + msg + '<span></p></div>'+
-        '<div id="Potential" class="tabcontent"><p><strong>Potential Efficiency:</strong> <span class="">' + msg2 + '<span></p></div>'+
-        '<div id="Other" class="tabcontent"><p><strong>UPRN:</strong>' + features['properties']['UPRN'] + '</p>'+
-        '<p><strong>Lat:</strong> ' + coords[1] + '<br ><strong>Long:</strong> ' + coords[0]+'</p></div>';
+        '<div id="Current" class="tabcontent active"><p><strong>Current Efficiency: </strong> <span class="">' + msg + '<span></p></div>'+
+        '<div id="Potential" class="tabcontent"><p><strong>Potential Efficiency: </strong> <span class="">' + msg2 + '<span></p></div>'+
+        '<div id="Other" class="tabcontent"><p><strong>UPRN: </strong>' + features['properties']['UPRN'] + '</p>'+
+        '<p><strong>Lat: </strong> ' + coords[1] + '<br ><strong>Long: </strong> ' + coords[0]+'</p></div>';
 
         var popup = new mapboxgl.Popup({ offset: [5, -30] })
             .setLngLat(coords)
-            //.setHTML('<h3>EPC Info</h3><p><strong>Current Efficiency:</strong> <span class="">' + msg + '<span></p><p><strong>Potential Efficiency:</strong> <span class="">' + msg2 + '<span></p><p><strong>UPRN:</strong>' + features['properties']['UPRN'] + '</p><p><strong>Latitude:</strong> ' + coords[1] + '<br ><strong>Longitude:</strong> ' + coords[0]+'</p>')
+            //.setHTML('<h3>EPC Info</h3><p><strong>Current Efficiency: </strong> <span class="">' + msg + '<span></p><p><strong>Potential Efficiency: </strong> <span class="">' + msg2 + '<span></p><p><strong>UPRN: </strong>' + features['properties']['UPRN'] + '</p><p><strong>Latitude: </strong> ' + coords[1] + '<br ><strong>Longitude: </strong> ' + coords[0]+'</p>')
             .setHTML(popupHTML)
             .addTo(map);
 
@@ -681,6 +745,17 @@ function getCurrentDisplayInfo(){
 
         }
        
+        const epcRenderedFeatures = getRenderedFeatures('epc-layer');
+        const boundaryPoints = features.geometry.coordinates[0];
+
+        const wardEpcData = dataInDefinedArea(epcRenderedFeatures, boundaryPoints);
+
+        var foundFeaturePolygons = wardEpcData.foundFeaturePolygons;
+        var foundFeatures = wardEpcData.foundFeatures;
+        var totalEPC = wardEpcData.totalEPC;
+        var totalPotentialEPC = wardEpcData.totalPotentialEPC;
+        var foundFeatureUprns = wardEpcData.foundFeatureUprns;
+
         let ward_id = features['properties']['OBJECTID'];
         let ward_21CD = features['properties']['WD21CD'];
         let ward_21NM = features['properties']['WD21NM'];
@@ -694,15 +769,13 @@ function getCurrentDisplayInfo(){
         var popup = new mapboxgl.Popup({ offset: [0, 0] })
             .setLngLat(coords)
             .setHTML('<h3>Ward Info</h3>'+
-            '<p><strong>ID:</strong><span class="">' + ward_id + '<span></p>'+
-            '<p><strong>WD21CD:</strong><span class="">' + ward_21CD + '<span></p>'+
-            '<p><strong>WD21NM:</strong><span class="">' + ward_21NM + '<span></p>'+
-            '<p><strong>WD21NMW:</strong><span class="">' + ward_21NMW + '<span></p>'+
-            '<p><strong>BNG_E:</strong><span class="">' + ward_BNG_E + '<span></p>'+
-            '<p><strong>Area:</strong><span class="">' + ward_area + '<span></p>'+
-            '<p><strong>Length:</strong><span class="">' + ward_length + '<span></p>')
+            '<p><strong>ID: </strong><span class="">' + ward_id + '<span></p>'+
+            '<p><strong>WD21CD: </strong><span class="">' + ward_21CD + '<span></p>'+
+            '<p><strong>EPC Features: </strong><span class="">' + foundFeatures + '<span></p>'+
+            '<p><strong>Total EPC: </strong><span class="">' + totalEPC + '<span></p>'+
+            '<p><strong>Total Potential EPC: </strong><span class="">' + totalPotentialEPC + '<span></p>')
             .addTo(map);
-    });
+        });
 
     map.on('click', 'lsoaChoropleth', (e) => {
 
@@ -741,12 +814,25 @@ function getCurrentDisplayInfo(){
         let lsoa_BLACK = features['properties']['BLACK'];
         let lsoa_ARAB_AND_OTHER = features['properties']['ARAB_AND_OTHER'];
        
+        const epcRenderedFeatures = getRenderedFeatures('epc-layer');
+        const boundaryPoints = features.geometry.coordinates[0];
+
+        const lsoaEpcData = dataInDefinedArea(epcRenderedFeatures, boundaryPoints);
+
+        var foundFeaturePolygons = lsoaEpcData.foundFeaturePolygons;
+        var foundFeatures = lsoaEpcData.foundFeatures;
+        var totalEPC = lsoaEpcData.totalEPC;
+        var totalPotentialEPC = lsoaEpcData.totalPotentialEPC;
+        var foundFeatureUprns = lsoaEpcData.foundFeatureUprns;
+
         var popup = new mapboxgl.Popup({ offset: [5, -30] })
         .setLngLat(coords)
         .setHTML('<h3>LSOA Info</h3>'+
-        '<p><strong>11NM:</strong><span class="">' + lsoa_11NM + '<span></p>'+
-        '<p><strong>Area:</strong><span class="">' + lsoa_area + '<span></p>'+
-        '<p><strong>Length:</strong><span class="">' + lsoa_length + '<span></p>')
+        '<p><strong>11NM: </strong><span class="">' + lsoa_11NM + '<span></p>'+
+        '<p><strong>11CD: </strong><span class="">' + lsoa_11CD + '<span></p>'+
+        '<p><strong>EPC Features: </strong><span class="">' + foundFeatures + '<span></p>'+
+        '<p><strong>Total EPC: </strong><span class="">' + totalEPC + '<span></p>'+
+        '<p><strong>Total Potential EPC: </strong><span class="">' + totalPotentialEPC + '<span></p>')
         .addTo(map);
     });
 
@@ -1093,353 +1179,274 @@ function getCurrentDisplayInfo(){
     });
 
     // TIMESERIES
+    var leeMarstonDataURL = 'http://127.0.0.1:8000/static/js/data/lea-marston_wmids.csv';
 
-    // Set up the checkbox menu
-    function createCheckboxes() {
+    var traceOptions = [
+        {'csv_name': 'Net Demand', 'suffix': 'net_demand', 'color': '#17becf'},
+        {'csv_name': 'Generation', 'suffix': 'generation', 'color':'#d40dd1'},
+        {'csv_name': 'Import', 'suffix': 'import', 'color': '#c82f2f'},
+        {'csv_name': 'Solar', 'suffix': 'solar', 'color': '#fbf868'},
+        {'csv_name': 'Wind', 'suffix': 'wind', 'color': '#1508a6'},
+        {'csv_name': 'STOR', 'suffix': 'stored', 'color': '#0b0b0b'},
+        {'csv_name': 'Other', 'suffix': 'other', 'color': '#489341'}
+    ];
 
-        // Select the container div
-        var DISPLAY_OPTIONS = document.getElementById('data-display-opts');
+    function timeSeriesDisplay(dataURL, traceOptions){
 
-        // Setting up options for checkboxes
-        const AVAILABLE_DISPLAY_OPTIONS = [
-            {
-                id: 1,
-                datatype: 'datapoints_net_demand',
-                name: 'Net Demand',
-                value: 'trace1',
-                holder: 'datapoints_net_demand_div'
+        var rawDataURL = dataURL;
+
+        var dataOptions = {
+                options: [
+
+                ]
+            };
+
+        var xField = 'Date';
+        var yField = 'All';
+
+        var selectorOptions = {
+            buttons: [{
+                step: 'minutes',
+                stepmode: 'backward',
+                count: 1,
+                label: '5mins'
             },
             {
-                id: 2,
-                datatype: 'datapoints_generation',
-                name: 'Generation',
-                value: 'trace2',
-                holder: 'datapoints_generation_div'
+                step: 'minutes',
+                stepmode: 'backward',
+                count: 30,
+                label: '30mins'
             },
             {
-                id: 3,
-                datatype: 'datapoints_import',
-                name: 'Import',
-                value: 'trace3',
-                holder: 'datapoints_import_div'
-            },
-            {
-                id: 4,
-                datatype: 'datapoints_solar',
-                name: 'Solar',
-                value: 'trace4',
-                holder: 'datapoints_solar_div'
-            },
-            {
-                id: 5,
-                datatype: 'datapoints_wind',
-                name: 'Wind',
-                value: 'trace5',
-                holder: 'datapoints_wind_div'
-            },
-            {
-                id: 6,
-                datatype: 'datapoints_stor',
-                name: 'STOR',
-                value: 'trace6',
-                holder: 'datapoints_stor_div'
-            },
-            {
-                id: 7,
-                datatype: 'datapoints_other',
-                name: 'Other',
-                value: 'trace7',
-                holder: 'datapoints_other_div'
+                step: 'hours',
+                stepmode: 'backward',
+                count: 1,
+                label: 'hour'
+            }],
+        };
+
+        d3.csv(rawDataURL, function(err, rows){
+
+            if(err) throw err;
+
+            function unpack(rows, key) {
+
+                return rows.map(function(row) { return row[key]; });
+
             }
-        ];
 
-        var SELECTED_DISPLAY_OPTION = 1; 
+            // Extracting values for the slider
+            const datapoints_timestamp = unpack(rows, 'Timestamp');
+            const datapoints_net_demand = unpack(rows, 'Net Demand');
+            const datapoints_generation = unpack(rows, 'Generation');
+            const datapoints_import = unpack(rows, 'Import');
+            const datapoints_solar = unpack(rows, 'Solar');
+            const datapoints_wind = unpack(rows, 'Wind');
+            const datapoints_stor = unpack(rows, 'STOR');
+            const datapoints_other = unpack(rows, 'Other');
+            const num_datapoints = datapoints_timestamp.length - 1;
 
-        for (const DISPLAY_OPTION of AVAILABLE_DISPLAY_OPTIONS) {
+            const min_timestamp = new Date(Math.min.apply(null, datapoints_timestamp.map(function(e) {
+                                    return new Date(e);
+                                  })));
+            const max_timestamp = new Date(Math.max.apply(null, datapoints_timestamp.map(function(e) {
+                                      return new Date(e);
+                                    })));
 
-            const checkboxItem = document.createElement('div');
-            const checkboxInput = document.createElement('input');
-            const checkboxLabel = document.createElement('label');
+            const min_net_demand = Math.min(...datapoints_net_demand);
+            const max_net_demand = Math.max(...datapoints_net_demand);
 
-            // Assign attributes
-            checkboxItem.className = "div-flex-row form-check-inline toggletrigger";
-            checkboxItem.id = DISPLAY_OPTION.holder;
+            function prepData(rows, selected_display_option) {
 
-            checkboxInput.className = "checkbox-data-type"
-            checkboxInput.type = 'checkbox';
-            checkboxInput.name = 'toggle-display-option';
+                var x = datapoints_timestamp;
+                console.log('x:' + x);
+                var y = datapoints_net_demand; //selected_display_option;
+                console.log('y:' + y);
+                console.log(rows.length)
 
-            checkboxInput.id = DISPLAY_OPTION.datatype;
-            checkboxInput.value = DISPLAY_OPTION.value;
-            checkboxInput.checked = DISPLAY_OPTION.id === SELECTED_DISPLAY_OPTION;
+                rows.forEach(function(datum, i) {
+                    if(i % 100) return;
 
-            checkboxLabel.htmlFor = DISPLAY_OPTION.datatype;
-            checkboxLabel.innerText = DISPLAY_OPTION.name;
+                    x.push(new Date(datum[xField]));
+                    y.push(datum[yField]);
+                });
 
-            // Append the input and label elements to the checkboxItem div.
-            checkboxItem.appendChild(checkboxInput);
-            checkboxItem.appendChild(checkboxLabel);
+                return [{
+                    mode: 'lines',
+                    x: x,
+                    y: y
+                }];
+            }
 
-            // Append the checkboxItem div to the containerItem div that will contain all the checkboxes.
-            DISPLAY_OPTIONS.appendChild(checkboxItem);
+            var trace1 = {
+                type: "scatter",
+                mode: "lines",
+                name: "Net Demand",
+                x: datapoints_timestamp,
+                y: datapoints_net_demand,
+                line: { color: "#17becf" }
+            };
+            var trace2 = {
+                type: "scatter",
+                mode: "lines",
+                name: "Generation",
+                x: datapoints_timestamp,
+                y: datapoints_generation,
+                line: { color: "#d40dd1" }
+            };
+            var trace3 = {
+                type: "scatter",
+                mode: "lines",
+                name: "Import",
+                x: datapoints_timestamp,
+                y: datapoints_import,
+                line: { color: "#c82f2f" }
+            };
+            var trace4 = {
+                type: "scatter",
+                mode: "lines",
+                name: "Solar",
+                x: datapoints_timestamp,
+                y: datapoints_solar,
+                line: { color: "#fbf868" }
+            };
+            var trace5 = {
+                type: "scatter",
+                mode: "lines",
+                name: "Wind",
+                x: datapoints_timestamp,
+                y: datapoints_wind,
+                line: { color: "#1508a6" }
+            };
+            var trace6 = {
+                type: "scatter",
+                mode: "lines",
+                name: "Stored",
+                x: datapoints_timestamp,
+                y: datapoints_stor,
+                line: { color: "#0b0b0b" }
+            };
+            var trace7 = {
+                type: "scatter",
+                mode: "lines",
+                name: "Other",
+                x: datapoints_timestamp,
+                y: datapoints_other,
+                line: { color: "#489341" }
+            };
 
-        }
+            const allTraces = { trace1, trace2, trace3, trace4, trace5, trace6, trace7 };
+
+            var layout = {
+                plot_bgcolor: "rgba(0,0,0,0)",
+                paper_bgcolor: "rgba(0,0,0,0)",
+                width: 900,
+                height: 440,
+                title: 'Lea Marston - GSP Time Series',
+                font: {
+                    //color: 'aqua' TODO: ALT COLOURS
+                    color: '#333'
+                },
+                xaxis: {
+                    //autorange: true,
+                    range: [min_timestamp, max_timestamp],
+                    rangeselector: {buttons: [
+                        {
+                          count: 30,
+                          label: '30min',
+                          step: 'minute',
+                          stepmode: 'backward'
+                        },
+                        {
+                          count: 1,
+                          label: '1h',
+                          step: 'hour',
+                          stepmode: 'backward'
+                        },
+                        {
+                          count: 1,
+                          label: '1d',
+                          step: 'day',
+                          stepmode: 'backward'
+                        },
+                        {
+                          count: 7,
+                          label: '1w',
+                          step: 'day',
+                          stepmode: 'backward'
+                        },
+                        {
+                          count: 1,
+                          label: '1m',
+                          step: 'month',
+                          stepmode: 'backward'
+                        },
+                        /*{
+                          count: 3,
+                          label: '3m',
+                          step: 'month',
+                          stepmode: 'backward'
+                        },*/
+
+                        {step: 'all'}
+
+                    ]},
+                    rangeslider: {range: [min_timestamp, max_timestamp] },
+                    type: 'date'
+                },
+
+                yaxis: {
+                    autorange: true,
+                    range: [min_net_demand, max_net_demand],
+                    type: 'linear'
+                }
+
+            };
+
+
+            // Function to update plot based on selected checkboxes
+            function updatePlot() {
+                const selectedTraces = [];
+                document.querySelectorAll('#data-display-opts input[type="checkbox"]').forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedTraces.push(allTraces[checkbox.value]);
+                    }
+                });
+
+                // Get date range from datepickers
+                var startDate = document.getElementById('start-date').value;
+                var endDate = document.getElementById('end-date').value;
+
+                if(startDate && endDate) {
+                    //alert('updating plot with dates: ' + new Date(startDate) + ' and ' + new Date(endDate));
+                    layout.xaxis.range = [new Date(startDate), new Date(endDate)];
+                } else {
+                    layout.xaxis.range = [min_timestamp, max_timestamp];
+                }
+                //alert('updating plot');
+                // Update plot with the selected traces
+                Plotly.react('gsp-plot', selectedTraces, layout);
+            }
+
+            // Add event listeners to checkboxes
+            document.querySelectorAll('#data-display-opts input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updatePlot);
+            });
+
+            // Add event listeners for date inputs
+            document.getElementById('start-date').addEventListener('change', updatePlot);
+            document.getElementById('end-date').addEventListener('change', updatePlot);
+
+            // Initial plot
+            updatePlot();
+        });
 
     }
 
-    // Call the function to create and append checkboxes
-    createCheckboxes();
-
-    var rawDataURL = 'https://bear-rsg.github.io/diatomic/js/data/lea-marston_wmids.csv';
-    var dataOptions = {
-            options: [
-
-            ]
-        };
-
-    var xField = 'Date';
-    var yField = 'All';
-
-    var selectorOptions = {
-        buttons: [{
-            step: 'minutes',
-            stepmode: 'backward',
-            count: 1,
-            label: '5mins'
-        },
-        {
-            step: 'minutes',
-            stepmode: 'backward',
-            count: 30,
-            label: '30mins'
-        },
-        {
-            step: 'hours',
-            stepmode: 'backward',
-            count: 1,
-            label: 'hour'
-        }],
-    };
-
-    d3.csv(rawDataURL, function(err, rows){
-
-        if(err) throw err;
-
-        function unpack(rows, key) {
-
-            return rows.map(function(row) { return row[key]; });
-
-        }
-
-        // Extracting values for the slider
-        const datapoints_timestamp = unpack(rows, 'Timestamp');
-        const datapoints_net_demand = unpack(rows, 'Net Demand');
-        const datapoints_generation = unpack(rows, 'Generation');
-        const datapoints_import = unpack(rows, 'Import');
-        const datapoints_solar = unpack(rows, 'Solar');
-        const datapoints_wind = unpack(rows, 'Wind');
-        const datapoints_stor = unpack(rows, 'STOR');
-        const datapoints_other = unpack(rows, 'Other');
-        const num_datapoints = datapoints_timestamp.length - 1;
-
-        const min_timestamp = new Date(Math.min.apply(null, datapoints_timestamp.map(function(e) {
-                                return new Date(e);
-                              })));
-        const max_timestamp = new Date(Math.max.apply(null, datapoints_timestamp.map(function(e) {
-                                  return new Date(e);
-                                })));
-
-        const min_net_demand = Math.min(...datapoints_net_demand);
-        const max_net_demand = Math.max(...datapoints_net_demand);
-
-        function prepData(rows, selected_display_option) {
-
-            var x = datapoints_timestamp;
-            console.log('x:' + x);
-            var y = datapoints_net_demand; //selected_display_option;
-            console.log('y:' + y);
-            console.log(rows.length)
-
-            rows.forEach(function(datum, i) {
-                if(i % 100) return;
-
-                x.push(new Date(datum[xField]));
-                y.push(datum[yField]);
-            });
-
-            return [{
-                mode: 'lines',
-                x: x,
-                y: y
-            }];
-        }
-
-        var trace1 = {
-            type: "scatter",
-            mode: "lines",
-            name: "Net Demand",
-            x: datapoints_timestamp,
-            y: datapoints_net_demand,
-            line: { color: "#17becf" }
-        };
-        var trace2 = {
-            type: "scatter",
-            mode: "lines",
-            name: "Generation",
-            x: datapoints_timestamp,
-            y: datapoints_generation,
-            line: { color: "#d40dd1" }
-        };
-        var trace3 = {
-            type: "scatter",
-            mode: "lines",
-            name: "Import",
-            x: datapoints_timestamp,
-            y: datapoints_import,
-            line: { color: "#c82f2f" }
-        };
-        var trace4 = {
-            type: "scatter",
-            mode: "lines",
-            name: "Solar",
-            x: datapoints_timestamp,
-            y: datapoints_solar,
-            line: { color: "#fbf868" }
-        };
-        var trace5 = {
-            type: "scatter",
-            mode: "lines",
-            name: "Wind",
-            x: datapoints_timestamp,
-            y: datapoints_wind,
-            line: { color: "#1508a6" }
-        };
-        var trace6 = {
-            type: "scatter",
-            mode: "lines",
-            name: "Stored",
-            x: datapoints_timestamp,
-            y: datapoints_stor,
-            line: { color: "#0b0b0b" }
-        };
-        var trace7 = {
-            type: "scatter",
-            mode: "lines",
-            name: "Other",
-            x: datapoints_timestamp,
-            y: datapoints_other,
-            line: { color: "#489341" }
-        };
-
-        const allTraces = { trace1, trace2, trace3, trace4, trace5, trace6, trace7 };
-
-        var layout = {
-            plot_bgcolor: "rgba(0,0,0,0)",
-            paper_bgcolor: "rgba(0,0,0,0)",
-            width: 900,
-            height: 440,
-            title: 'Lea Marston - GSP Time Series',
-            font: {
-                //color: 'aqua' TODO: ALT COLOURS
-                color: '#333'
-            },
-            xaxis: {
-                //autorange: true,
-                range: [min_timestamp, max_timestamp],
-                rangeselector: {buttons: [
-                    {
-                      count: 30,
-                      label: '30min',
-                      step: 'minute',
-                      stepmode: 'backward'
-                    },
-                    {
-                      count: 1,
-                      label: '1h',
-                      step: 'hour',
-                      stepmode: 'backward'
-                    },
-                    {
-                      count: 1,
-                      label: '1d',
-                      step: 'day',
-                      stepmode: 'backward'
-                    },
-                    {
-                      count: 7,
-                      label: '1w',
-                      step: 'day',
-                      stepmode: 'backward'
-                    },
-                    {
-                      count: 1,
-                      label: '1m',
-                      step: 'month',
-                      stepmode: 'backward'
-                    },
-                    /*{
-                      count: 3,
-                      label: '3m',
-                      step: 'month',
-                      stepmode: 'backward'
-                    },*/
-
-                    {step: 'all'}
-
-                ]},
-                rangeslider: {range: [min_timestamp, max_timestamp] },
-                type: 'date'
-            },
-
-            yaxis: {
-                autorange: true,
-                range: [min_net_demand, max_net_demand],
-                type: 'linear'
-            }
-
-        };
-
-
-        // Function to update plot based on selected checkboxes
-        function updatePlot() {
-            const selectedTraces = [];
-            document.querySelectorAll('#data-display-opts input[type="checkbox"]').forEach(checkbox => {
-                if (checkbox.checked) {
-                    selectedTraces.push(allTraces[checkbox.value]);
-                }
-            });
-
-            // Get date range from datepickers
-            var startDate = document.getElementById('start-date').value;
-            var endDate = document.getElementById('end-date').value;
-
-            if(startDate && endDate) {
-                //alert('updating plot with dates: ' + new Date(startDate) + ' and ' + new Date(endDate));
-                layout.xaxis.range = [new Date(startDate), new Date(endDate)];
-            } else {
-                layout.xaxis.range = [min_timestamp, max_timestamp];
-            }
-            //alert('updating plot');
-            // Update plot with the selected traces
-            Plotly.react('gsp-plot', selectedTraces, layout);
-        }
-
-        // Add event listeners to checkboxes
-        document.querySelectorAll('#data-display-opts input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', updatePlot);
-        });
-
-        // Add event listeners for date inputs
-        document.getElementById('start-date').addEventListener('change', updatePlot);
-        document.getElementById('end-date').addEventListener('change', updatePlot);
-
-        // Initial plot
-        updatePlot();
-    });
-
-
-    
     $(document).ready(function(){
+
+        timeSeriesDisplay(leeMarstonDataURL, traceOptions);
+
 
         $('.mapbox-gl-draw_ctrl-draw-btn').on("mousedown", function() {
             draw.deleteAll();
