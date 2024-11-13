@@ -47,6 +47,8 @@
 
     const loadExtras = true;
     
+    var round = Math.round;
+
     const lightPresets = {
         sunrise: {
             "id": "sunrise_light",
@@ -576,19 +578,23 @@ function getCurrentDisplayInfo(){
         var totalPotentialEPC = areaData.totalPotentialEPC;
         var foundFeatureUprns = areaData.foundFeatureUprns;
 
-        alert("found " + foundFeatures + " features inside boundary");
+alert("found " + foundFeatures + " features inside boundary");
 
-        var round = Math.round;
-        var averageEfficiency = round(totalEPC / foundFeatures);
-        var potentialEfficiency = round(totalPotentialEPC / foundFeatures);
+        var averageEfficiency = '';
+        if(round(totalEPC / foundFeatures) > 0){
+            averageEfficiency = round(totalEPC / foundFeatures);
+        }
+        var averagePotentialEfficiency = '';
+        if(round(totalPotentialEPC / foundFeatures) > 0){
+            averagePotentialEfficiency = round(totalPotentialEPC / foundFeatures);
+        }
         var fpolygonsArr = JSON.stringify(foundFeaturePolygons);
-        //var strungFpolygonsArr = JSON.stringify(fpolygonsArr);
-        //console.log("fpolygonsArr: " + strungFpolygonsArr.substring(1,strungFpolygonsArr.length-1));
+        
         if(foundFeatures > 0){
             document.getElementById('avg-eff').innerHTML = averageEfficiency;
             document.getElementById('avg-eff').setAttribute('data-color', averageEfficiency);
-            document.getElementById('avg-pot-eff').innerHTML = potentialEfficiency;
-            document.getElementById('avg-pot-eff').setAttribute('data-color', potentialEfficiency);
+            document.getElementById('avg-pot-eff').innerHTML = averagePotentialEfficiency;
+            document.getElementById('avg-pot-eff').setAttribute('data-color', averagePotentialEfficiency);
 
         }
 
@@ -755,6 +761,14 @@ function getCurrentDisplayInfo(){
         var totalEPC = wardEpcData.totalEPC;
         var totalPotentialEPC = wardEpcData.totalPotentialEPC;
         var foundFeatureUprns = wardEpcData.foundFeatureUprns;
+        var averageEfficiency = '';
+        if(round(totalEPC / foundFeatures) > 0){
+            averageEfficiency = round(totalEPC / foundFeatures);
+        }
+        var averagePotentialEfficiency = '';
+        if(round(totalPotentialEPC / foundFeatures) > 0){
+            averagePotentialEfficiency = round(totalPotentialEPC / foundFeatures);
+        }
 
         let ward_id = features['properties']['OBJECTID'];
         let ward_21CD = features['properties']['WD21CD'];
@@ -773,7 +787,9 @@ function getCurrentDisplayInfo(){
             '<p><strong>WD21CD: </strong><span class="">' + ward_21CD + '<span></p>'+
             '<p><strong>EPC Features: </strong><span class="">' + foundFeatures + '<span></p>'+
             '<p><strong>Total EPC: </strong><span class="">' + totalEPC + '<span></p>'+
-            '<p><strong>Total Potential EPC: </strong><span class="">' + totalPotentialEPC + '<span></p>')
+            '<p><strong>Total Potential EPC: </strong><span class="">' + totalPotentialEPC + '<span></p>'+
+            '<p><strong>Average EPC: </strong><span class="">' + averageEfficiency + '<span></p>'+
+            '<p><strong>Average Potential EPC: </strong><span class="">' + averagePotentialEfficiency + '<span></p>')
             .addTo(map);
         });
 
@@ -825,14 +841,25 @@ function getCurrentDisplayInfo(){
         var totalPotentialEPC = lsoaEpcData.totalPotentialEPC;
         var foundFeatureUprns = lsoaEpcData.foundFeatureUprns;
 
+        var averageEfficiency = '';
+        if(round(totalEPC / foundFeatures) > 0){
+            averageEfficiency = round(totalEPC / foundFeatures);
+        }
+        var averagePotentialEfficiency = '';
+        if(round(totalPotentialEPC / foundFeatures) > 0){
+            averagePotentialEfficiency = round(totalPotentialEPC / foundFeatures);
+        }
+        
         var popup = new mapboxgl.Popup({ offset: [5, -30] })
         .setLngLat(coords)
         .setHTML('<h3>LSOA Info</h3>'+
-        '<p><strong>11NM: </strong><span class="">' + lsoa_11NM + '<span></p>'+
-        '<p><strong>11CD: </strong><span class="">' + lsoa_11CD + '<span></p>'+
-        '<p><strong>EPC Features: </strong><span class="">' + foundFeatures + '<span></p>'+
-        '<p><strong>Total EPC: </strong><span class="">' + totalEPC + '<span></p>'+
-        '<p><strong>Total Potential EPC: </strong><span class="">' + totalPotentialEPC + '<span></p>')
+            '<p><strong>11NM: </strong><span class="">' + lsoa_11NM + '<span></p>'+
+            '<p><strong>11CD: </strong><span class="">' + lsoa_11CD + '<span></p>'+
+            '<p><strong>EPC Features: </strong><span class="">' + foundFeatures + '<span></p>'+
+            '<p><strong>Total EPC: </strong><span class="">' + totalEPC + '<span></p>'+
+            '<p><strong>Total Potential EPC: </strong><span class="">' + totalPotentialEPC + '<span></p>'+
+            '<p><strong>Average EPC: </strong><span class="">' + averageEfficiency + '<span></p>'+
+            '<p><strong>Average Potential EPC: </strong><span class="">' + averagePotentialEfficiency + '<span></p>')
         .addTo(map);
     });
 
