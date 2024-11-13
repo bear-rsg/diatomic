@@ -1179,6 +1179,99 @@ function getCurrentDisplayInfo(){
     });
 
     // TIMESERIES
+    function createCheckboxes() {
+
+        // Select the container div
+        var DISPLAY_OPTIONS = document.getElementById('data-display-opts');
+
+        // Setting up options for checkboxes
+        const AVAILABLE_DISPLAY_OPTIONS = [
+            {
+                id: 1,
+                datatype: 'datapoints_net_demand',
+                name: 'Net Demand',
+                value: 'trace1',
+                holder: 'datapoints_net_demand_div'
+            },
+            {
+                id: 2,
+                datatype: 'datapoints_generation',
+                name: 'Generation',
+                value: 'trace2',
+                holder: 'datapoints_generation_div'
+            },
+            {
+                id: 3,
+                datatype: 'datapoints_import',
+                name: 'Import',
+                value: 'trace3',
+                holder: 'datapoints_import_div'
+            },
+            {
+                id: 4,
+                datatype: 'datapoints_solar',
+                name: 'Solar',
+                value: 'trace4',
+                holder: 'datapoints_solar_div'
+            },
+            {
+                id: 5,
+                datatype: 'datapoints_wind',
+                name: 'Wind',
+                value: 'trace5',
+                holder: 'datapoints_wind_div'
+            },
+            {
+                id: 6,
+                datatype: 'datapoints_stor',
+                name: 'STOR',
+                value: 'trace6',
+                holder: 'datapoints_stor_div'
+            },
+            {
+                id: 7,
+                datatype: 'datapoints_other',
+                name: 'Other',
+                value: 'trace7',
+                holder: 'datapoints_other_div'
+            }
+        ];
+
+        var SELECTED_DISPLAY_OPTION = 1; // update from displayOptions?
+
+        for (const DISPLAY_OPTION of AVAILABLE_DISPLAY_OPTIONS) {
+
+            const checkboxItem = document.createElement('div');
+            const checkboxInput = document.createElement('input');
+            const checkboxLabel = document.createElement('label');
+
+            // Assign attributes
+            checkboxItem.className = "div-flex-row form-check-inline toggletrigger";
+            checkboxItem.id = DISPLAY_OPTION.holder;
+
+            checkboxInput.className = "checkbox-data-type"
+            checkboxInput.type = 'checkbox';
+            checkboxInput.name = 'toggle-display-option';
+
+            checkboxInput.id = DISPLAY_OPTION.datatype;
+            checkboxInput.value = DISPLAY_OPTION.value;
+            checkboxInput.checked = DISPLAY_OPTION.id === SELECTED_DISPLAY_OPTION;
+
+            checkboxLabel.htmlFor = DISPLAY_OPTION.datatype;
+            checkboxLabel.innerText = DISPLAY_OPTION.name;
+
+            // Append the input and label elements to the checkboxItem div.
+            checkboxItem.appendChild(checkboxInput);
+            checkboxItem.appendChild(checkboxLabel);
+
+            // Append the checkboxItem div to the containerItem div that will contain all the checkboxes.
+            DISPLAY_OPTIONS.appendChild(checkboxItem);
+
+        }
+
+    }
+
+
     var leeMarstonDataURL = 'https://bear-rsg.github.io/diatomic/js/data/lea-marston_wmids.csv';
 
     var traceOptions = [
@@ -1192,8 +1285,11 @@ function getCurrentDisplayInfo(){
     ];
 
     function timeSeriesDisplay(dataURL, traceOptions){
-
-        var rawDataURL = 'https://bear-rsg.github.io/diatomic/js/data/lea-marston_wmids.csv';
+        
+        // Call the function to create and append checkboxes
+        createCheckboxes();
+        
+        var rawDataURL = dataURL;
 
         var dataOptions = {
                 options: [
@@ -1443,10 +1539,10 @@ function getCurrentDisplayInfo(){
 
     }
     
-    timeSeriesDisplay(leeMarstonDataURL, traceOptions);
-
     $(document).ready(function(){
 
+        timeSeriesDisplay(leeMarstonDataURL, traceOptions);
+        
         $('.mapbox-gl-draw_ctrl-draw-btn').on("mousedown", function() {
             draw.deleteAll();
             $('#avg-eff').text('-');
