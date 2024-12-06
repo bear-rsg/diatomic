@@ -65,8 +65,13 @@
 #chPointstogglediv .ui-switcher[aria-checked=true] {
     background-color: #9542fb;
 }
+
 #heatmaptogglediv .ui-switcher[aria-checked=true] {
     background-color: #f23ed6;
+}
+
+#knowledgetogglediv .ui-switcher[aria-checked=true] {
+    background-color: #17c69d;
 }
 
 #epcTypeAtogglediv .ui-switcher[aria-checked=true] {
