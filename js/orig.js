@@ -770,10 +770,9 @@ alert("found " + foundFeatures + " features inside boundary");
             averagePotentialEfficiency = round(totalPotentialEPC / foundFeatures);
         }
 
-        let ward_id = features['properties']['OBJECTID'];
-        let ward_21CD = features['properties']['WD21CD'];
-        let ward_21NM = features['properties']['WD21NM'];
-        let ward_21NMW = features['properties']['WD21NMW'];
+        let ward_id = features['properties']['FID'];
+        let ward_24CD = features['properties']['WD24CD'];
+        let ward_24NM = features['properties']['WD24NM'];
         let ward_BNG_E = features['properties']['BNG_E'];
         let ward_long = features['properties']['LONG'];
         let ward_lat = features['properties']['LAT'];
@@ -784,7 +783,8 @@ alert("found " + foundFeatures + " features inside boundary");
             .setLngLat(coords)
             .setHTML('<h3>Ward Info</h3>'+
             '<p><strong>ID: </strong><span class="">' + ward_id + '<span></p>'+
-            '<p><strong>WD21CD: </strong><span class="">' + ward_21CD + '<span></p>'+
+            '<p><strong>WD24CD: </strong><span class="">' + ward_24CD + '<span></p>'+
+            '<p><strong>WD24NM: </strong><span class="">' + ward_24NM + '<span></p>'+
             '<p><strong>EPC Features: </strong><span class="">' + foundFeatures + '<span></p>'+
             '<p><strong>Total EPC: </strong><span class="">' + totalEPC + '<span></p>'+
             '<p><strong>Total Potential EPC: </strong><span class="">' + totalPotentialEPC + '<span></p>'+
@@ -910,7 +910,7 @@ alert("found " + foundFeatures + " features inside boundary");
                        'visibility': 'none'
                    },
                    'minzoom': 10,
-                   'maxzoom': 15,
+                   'maxzoom': 17,
                    'type': 'fill',
                    'paint': {
                        'fill-color': '#fc7676',
@@ -929,7 +929,7 @@ alert("found " + foundFeatures + " features inside boundary");
                        'line-cap': 'round'
                    },
                    'minzoom': 10,
-                   'maxzoom': 15,
+                   'maxzoom': 17,
                    'paint': {
                        'line-color': '#b60000',
                        'line-width': {
@@ -981,7 +981,7 @@ alert("found " + foundFeatures + " features inside boundary");
                         'line-cap': 'round'
                     },
                     'minzoom': 10,
-                    'maxzoom': 15,
+                    'maxzoom': 17,
                     'paint': {
                         'fill-color': ['feature-state', 'color'],
                         //'fill-color': '#385dce',
@@ -1001,7 +1001,7 @@ alert("found " + foundFeatures + " features inside boundary");
                         'line-cap': 'round'
                     },
                     'minzoom': 10,
-                    'maxzoom': 15,
+                    'maxzoom': 17,
                     'paint': {
                         'line-color': '#385dce', // blue color fill
                         'line-width': {
