@@ -46,7 +46,7 @@
 
 
     const loadExtras = true;
-    
+
     var round = Math.round;
 
     const lightPresets = {
@@ -121,10 +121,10 @@
         //map.setLights([lightSettings]);
         map.setConfigProperty('basemap', 'lightPreset', preset);
     }
-                          
+
     map.addControl(
         new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,            
+            accessToken: mapboxgl.accessToken,
             countries: 'gb',
             bbox: [-1.9285,52.4604,-1.8557,52.4952],
             mapboxgl: mapboxgl
@@ -150,7 +150,7 @@
         });
         return;
     }
-    
+
     function flatView() {
         console.log("going to flat view");
         map.jumpTo({
@@ -168,7 +168,7 @@
         });
         return;
     }
-    
+
     function setChanged(opt){
         if(opt==1){
             changed_vals = true;
@@ -182,7 +182,7 @@
     }
 
     const draw = new MapboxDraw({
-        displayControlsDefault: false,        
+        displayControlsDefault: false,
         controls: {
             polygon: true,
             trash: true
@@ -224,7 +224,7 @@ function getCurrentDisplayInfo(){
         var zoom = map.getZoom();
         const zoom_str = zoom.toString();
         const zoom_trim = zoom_str.slice(0, 4);
-        var centre = map.getCenter(); 
+        var centre = map.getCenter();
         const lat_str = centre['lat'].toString();
         const lat = lat_str.slice(0, 6);
         const lng_str = centre['lng'].toString();
@@ -235,7 +235,7 @@ function getCurrentDisplayInfo(){
         var bearing = map.getBearing();
         const bearing_str = bearing.toString();
         const bearing_trim = bearing_str.slice(0, 5);
-        var toggleArr = []; 
+        var toggleArr = [];
         let valuesDict = { 'zoom': zoom_trim, 'centre_lat': lat, 'centre_lng': lng, 'pitch': pitch_trim, 'bearing': bearing_trim, 'toggles': toggleArr };
         return valuesDict;
     }
@@ -287,7 +287,7 @@ function getCurrentDisplayInfo(){
 
         if(count > 0){
             for(var i=0;i<count;i++){
-                var histObj = foundSrcFeat[i]; 
+                var histObj = foundSrcFeat[i];
                 var histVal = '-1';
                 if(histType == 'current-energy-efficiency'){
                     histVal = histObj['properties']['current-energy-efficiency'];
@@ -326,11 +326,11 @@ function getCurrentDisplayInfo(){
             ];
         }
     }
-    
+
     function buildFilter(arr, ftype) {
         var filter_type = ftype;
         var epcToggleArray = arr;
-        
+
         if(map.getLayer('epc-layer')){
 
             const epcA_range = [92, 93, 94, 95, 96, 97, 98, 99, 100];
@@ -381,13 +381,13 @@ function getCurrentDisplayInfo(){
                 }
                 if(epcToggleArray.includes('epcTypeB')){
                     epcFilter = epcFilter.concat(epcG_range);
-                }                
+                }
             }
 
             var selFilter = [];
             var selFilter2 = [];
             var multipleFilters = false;
-            if(noneOnly == true){                
+            if(noneOnly == true){
                 selFilter = ['!', ['in', ['get', filter_type], ['literal', epcFilterAll]]];
             }else{
                 if((epcFilterSet == true) && (epcShowNone == true)){
@@ -395,7 +395,7 @@ function getCurrentDisplayInfo(){
                     selFilter = ['in', ['get', filter_type], ['literal', epcFilter]];
                     selFilter2 = ['!has', ['get', filter_type]]; // show non-epc rated buildings
 
-                }else if(epcFilterSet == true){                    
+                }else if(epcFilterSet == true){
                     selFilter = ['in', ['get', filter_type], ['literal', epcFilter]];
                 }
             }
@@ -416,7 +416,7 @@ function getCurrentDisplayInfo(){
     }
 
     function foundLassoFeatures(fpolygonsArr){
-        var foundArr = fpolygonsArr;        
+        var foundArr = fpolygonsArr;
         var fc = turf.featureCollection(foundArr);
         clearFoundFeatures();
 
@@ -431,11 +431,11 @@ function getCurrentDisplayInfo(){
                 data: fc
             });
         }
-        
+
         map.addLayer({
             'id': 'found-layer',
             'type': 'fill-extrusion',
-            'source': 'found', 
+            'source': 'found',
             'paint': {
                 'fill-extrusion-color': '#053ef7',
                 'fill-extrusion-height': 35,
@@ -589,7 +589,7 @@ alert("found " + foundFeatures + " features inside boundary");
             averagePotentialEfficiency = round(totalPotentialEPC / foundFeatures);
         }
         var fpolygonsArr = JSON.stringify(foundFeaturePolygons);
-        
+
         if(foundFeatures > 0){
             document.getElementById('avg-eff').innerHTML = averageEfficiency;
             document.getElementById('avg-eff').setAttribute('data-color', averageEfficiency);
@@ -668,7 +668,7 @@ alert("found " + foundFeatures + " features inside boundary");
         $('#collapse1').collapse('show');
 
         const features = e.features[0];
-        
+
         const coordinates = features.geometry.coordinates;
          if(features.geometry.type == 'MultiPolygon'){
            var coords = coordinates[0][0][0];
@@ -708,7 +708,7 @@ alert("found " + foundFeatures + " features inside boundary");
             msg4 = '-';
 
         }
-        
+
         const currentEfficiency = features['properties']['current-energy-efficiency'];
         const potentialEfficiency = features['properties']['potential-energy-efficiency'];
 
@@ -735,14 +735,14 @@ alert("found " + foundFeatures + " features inside boundary");
             .addTo(map);
 
     });
-    
+
     map.on('click', 'wardBoundaries', (e) => {
 
         $('#control-panel').show();
         $('#collapse1').collapse('show');
 
         const features = e.features[0];
-       
+
         const coordinates = features.geometry.coordinates;
         if(features.geometry.type == 'MultiPolygon'){
            var coords = coordinates[0][0][0];
@@ -750,7 +750,7 @@ alert("found " + foundFeatures + " features inside boundary");
            var coords = coordinates[0][0];
 
         }
-       
+
         const epcRenderedFeatures = getRenderedFeatures('epc-layer');
         const boundaryPoints = features.geometry.coordinates[0];
 
@@ -829,7 +829,7 @@ alert("found " + foundFeatures + " features inside boundary");
         let lsoa_ASIAN = features['properties']['ASIAN'];
         let lsoa_BLACK = features['properties']['BLACK'];
         let lsoa_ARAB_AND_OTHER = features['properties']['ARAB_AND_OTHER'];
-       
+
         const epcRenderedFeatures = getRenderedFeatures('epc-layer');
         const boundaryPoints = features.geometry.coordinates[0];
 
@@ -849,7 +849,7 @@ alert("found " + foundFeatures + " features inside boundary");
         if(round(totalPotentialEPC / foundFeatures) > 0){
             averagePotentialEfficiency = round(totalPotentialEPC / foundFeatures);
         }
-        
+
         var popup = new mapboxgl.Popup({ offset: [5, -30] })
         .setLngLat(coords)
         .setHTML('<h3>LSOA Info</h3>'+
@@ -868,9 +868,9 @@ alert("found " + foundFeatures + " features inside boundary");
         map.on('idle', stopSpinner);
     }
 
-    const stopSpinner = (e) => {        
+    const stopSpinner = (e) => {
         document.getElementById("loader").style.visibility = "hidden";
-        map.off('idle', stopSpinner);       
+        map.off('idle', stopSpinner);
         setChanged(1);
     }
 
@@ -878,7 +878,7 @@ alert("found " + foundFeatures + " features inside boundary");
         document.getElementById("loader").style.visibility = "visible";
         if(!map.getSource('epc')){
             map.addSource('epc', {
-                type: 'geojson',                
+                type: 'geojson',
                 data: 'https://bear-rsg.github.io/diatomic/js/data/wmca_epc_data.geojson'
             });
 
@@ -886,7 +886,7 @@ alert("found " + foundFeatures + " features inside boundary");
                 'id': 'epc-layer',
                 'source': 'epc',
                 'type': 'fill-extrusion',
-                'paint': {                    
+                'paint': {
                     'fill-extrusion-color': {
                         property: 'current-energy-efficiency',
                         stops: [[0, '#000000'], [21, '#d4340d'], [39, '#f06e2d'], [55, '#f8b368'], [69, '#f0c713'], [81, '#8cc637'], [92, '#1bb359'], [100, '#02895d']]
@@ -898,6 +898,51 @@ alert("found " + foundFeatures + " features inside boundary");
         }
 
         if(loadExtras){
+            if(!map.getSource('knowledgeq')){
+                map.addSource('knowledgeq', {
+                    type: 'geojson',
+                    data: 'https://bear-rsg.github.io/diatomic/js/data/BKQ-2024-12.geojson'
+                });
+                map.addLayer({
+                   'id': 'knowledge-quarter',
+                   'source': 'knowledgeq',
+                   'layout': {
+                       'visibility': 'none'
+                   },
+                   'minzoom': 10,
+                   'maxzoom': 15,
+                   'type': 'fill',
+                   'paint': {
+                       'fill-color': '#fc7676',
+                       'fill-outline-color': 'rgba(182, 0, 0, 0.9)',
+                       'fill-opacity': 0.2
+                   }
+               });
+               map.addLayer({
+                   'id': 'knowledge-quarter_border',
+                   'type': 'line',
+                   'source': 'knowledgeq', // reference the data source
+                   'layout': {
+                       // Make the layer non-visible by default - turn on by checkbox toggle
+                       'visibility': 'none',
+                       'line-join': 'round',
+                       'line-cap': 'round'
+                   },
+                   'minzoom': 10,
+                   'maxzoom': 15,
+                   'paint': {
+                       'line-color': '#b60000',
+                       'line-width': {
+                           'type': 'exponential',
+                           'stops': [
+                               [11, 1],
+                               [15, 2],
+                           ]
+                       },
+                   }
+               });
+            }
+
             if(!map.getSource('heatmap')){
                 map.addSource('heatmap', {
                     type: 'geojson',
@@ -919,11 +964,11 @@ alert("found " + foundFeatures + " features inside boundary");
                    }
                });
             }
-            
+
             if(!map.getSource('wards')){
                 map.addSource('wards', {
                     type: 'geojson',
-                    data: 'https://bear-rsg.github.io/diatomic/js/data/CLP-wards_4326.geojson'
+                    data: 'https://bear-rsg.github.io/diatomic/js/data/east-birmingham-inclusive-growth.geojson'
                 });
                 map.addLayer({
                     'id': 'wardBoundaries',
@@ -941,7 +986,7 @@ alert("found " + foundFeatures + " features inside boundary");
                         'fill-color': ['feature-state', 'color'],
                         //'fill-color': '#385dce',
                         'fill-outline-color': 'rgba(0, 0, 0, 0.2)',
-                        'fill-opacity': 0.3,
+                        'fill-opacity': 0.2,
                     }
                 });
 
@@ -982,7 +1027,7 @@ alert("found " + foundFeatures + " features inside boundary");
                     "id": "lsoaChoropleth",
                     "type": "fill",
                     "source": "lsoas",
-                    'layout': {                        
+                    'layout': {
                         'visibility': 'none'
                     },
                     "paint": {
@@ -1005,7 +1050,7 @@ alert("found " + foundFeatures + " features inside boundary");
                     },
                 });
             }
-            
+
             if(!map.getSource('chargepoints')){
                 map.addSource('chargepoints', {
                     type: 'geojson',
@@ -1020,7 +1065,7 @@ alert("found " + foundFeatures + " features inside boundary");
                         // Make the layer non-visible by default.
                         'visibility': 'none'
                     },
-                    'paint': {                        
+                    'paint': {
                         'circle-radius': {
                             'type': 'exponential',
                             'stops': [
@@ -1030,7 +1075,7 @@ alert("found " + foundFeatures + " features inside boundary");
                             ]
                         },
                         "circle-color": "#913bfb",
-                        'circle-stroke-color': '#ffffff', 
+                        'circle-stroke-color': '#ffffff',
                         'circle-stroke-width': {
                             'type': 'exponential',
                             'stops': [
@@ -1119,8 +1164,8 @@ alert("found " + foundFeatures + " features inside boundary");
 
             resetCanvas('effChart');
             var eff_ctx = document.getElementById('effChart').getContext('2d');
-            var chart1 = new Chart(eff_ctx, {                
-                type: 'bar',                
+            var chart1 = new Chart(eff_ctx, {
+                type: 'bar',
                 data: {
                     labels: ['G', 'F', 'E', 'D', 'C', 'B', 'A' ],
                     datasets: [{
@@ -1133,7 +1178,7 @@ alert("found " + foundFeatures + " features inside boundary");
 
                     }]
                 },
-                
+
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -1171,7 +1216,7 @@ alert("found " + foundFeatures + " features inside boundary");
 
                     }]
                 },
-                
+
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -1313,9 +1358,9 @@ alert("found " + foundFeatures + " features inside boundary");
 
     // Call the function to create and append checkboxes
     createCheckboxes();
-    
+
     function timeSeriesDisplay(dataURL, traceOptions){
-        
+
         var rawDataURL = dataURL;
 
         var dataOptions = {
@@ -1565,11 +1610,11 @@ alert("found " + foundFeatures + " features inside boundary");
         });
 
     }
-    
+
     $(document).ready(function(){
 
         timeSeriesDisplay(leeMarstonDataURL, traceOptions);
-        
+
         $('.mapbox-gl-draw_ctrl-draw-btn').on("mousedown", function() {
             draw.deleteAll();
             $('#avg-eff').text('-');
@@ -1585,7 +1630,7 @@ alert("found " + foundFeatures + " features inside boundary");
         $('.mapbox-gl-draw_trash').on("mousedown", function() {
             clearFoundFeatures();
         });
-        
+
         //$('#threedmap_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
         $('#dimensionstoggle_div').insertAfter($(".mapboxgl-ctrl-top-left div:last"));
 
@@ -1755,6 +1800,7 @@ alert("found " + foundFeatures + " features inside boundary");
         var checkbox_link2 = document.querySelector('#wardBoundariestogglediv');
         var checkbox_link3 = document.querySelector('#chPointstogglediv');
         var checkbox_link4 = document.querySelector('#heatmaptogglediv');
+        var checkbox_link5 = document.querySelector('#knowledgetogglediv');
 
 
         var checkbox_layer = '';
@@ -1813,7 +1859,7 @@ alert("found " + foundFeatures + " features inside boundary");
                 map.setLayoutProperty('wardBoundaries_borders', 'visibility', 'none');
             }
         };
-        
+
         checkbox_link3.onclick = function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1829,7 +1875,7 @@ alert("found " + foundFeatures + " features inside boundary");
             if(is_active == 'true'){
                 toggle_on = true;
             }
-            
+
             if(toggle_on) {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
             } else {
@@ -1862,6 +1908,33 @@ alert("found " + foundFeatures + " features inside boundary");
             }
         };
 
+        checkbox_link5.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if($(this).attr('id') == 'knowledgetogglediv'){
+                checkbox_layer = 'knowledge-quarter';
+            }
+
+            var clickedLayer = checkbox_layer;
+
+            var is_active = $(this).find('.ui-switcher').attr('aria-checked');
+            var toggle_on = false;
+            if(is_active == 'true'){
+                toggle_on = true;
+            }
+
+            // Toggle layer visibility by changing the layout object's visibility property.
+            if(toggle_on) {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                map.setLayoutProperty('knowledge-quarter_border', 'visibility', 'visible');
+                zoomHigherFlat();
+            } else {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                map.setLayoutProperty('knowledge-quarter_border', 'visibility', 'none');
+            }
+        };
+
         var activeEpcFilters = [];
 
         const filterNav = document.getElementById('filter-group-epc-type');
@@ -1889,12 +1962,12 @@ alert("found " + foundFeatures + " features inside boundary");
                 }
 
             }
-            
+
             var epcType = 'current-energy-efficiency';
             if (epcRatingOptionsNav.querySelector('#pot_epc').checked) {
               epcType = 'potential-energy-efficiency';
             }
-            
+
             buildFilter(activeEpcFilters, epcType);
         }
 
